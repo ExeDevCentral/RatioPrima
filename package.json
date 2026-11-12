@@ -1,0 +1,24 @@
+{
+  "name": "polymath-zero",
+  "version": "1.0.0",
+  "description": "Polymath Zero - Plataforma Interactiva de Fundamentos Matemáticos y Demostraciones Formales para Pre-Ingreso Politécnico & Ingeniería",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "preview": "npm --prefix web run preview",
+    "test": "pytest tests/ 2>/dev/null || true"
+  },
+  "keywords": [
+    "mathematics",
+    "polytechnic",
+    "pre-engineering",
+    "calculus",
+    "algebra",
+    "learning-platform",
+    "astro",
+    "react"
+  ],
+  "author": "Exequiel Echevarria <exedevcentral@github.com>",
+  "license": "MIT"
+}
