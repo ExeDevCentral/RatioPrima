@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "description": "Polymath Zero - Plataforma Interactiva de Fundamentos Matemáticos y Demostraciones Formales para Pre-Ingreso Politécnico & Ingeniería",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "npm --prefix web run dev",
     "build": "npm --prefix web run build",
     "preview": "npm --prefix web run preview",
-    "test": "pytest tests/ 2>/dev/null || true"
+    "test": "node --test tests/workbench.test.ts",
+    "check": "cd web && npx tsc --noEmit"
   },
   "keywords": [
     "mathematics",

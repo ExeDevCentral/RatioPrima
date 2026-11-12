@@ -43,3 +43,4 @@ npm run build
 - **Módulo 03:** Geometría Analítica, Vectores en $\mathbb{R}^2/\mathbb{R}^3$ y Trigonometría Circular.
 - **Módulo 04:** Funciones Reales: Inyectividad, Sobreyectividad, Dominio Máximo y Continuidad.
 - **Módulo 05:** Intuición Geométrica y Rigor del Concepto de Límite ($\varepsilon$-$\delta$).
+
