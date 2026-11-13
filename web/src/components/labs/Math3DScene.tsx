@@ -26,6 +26,77 @@ interface Face3D {
   depth: number;
 }
 
+export const SCENE_BUILD_STEPS: Partial<Record<Scene3DKind, Array<{ title: string; kidText: string }>>> = {
+  sets3d: [
+    {
+      title: 'Anillo 1 (Verde): ℕ Naturales',
+      kidText: 'Son los números de contar cosas con los dedos: 1, 2, 3, 4... No hay negativos ni comas.'
+    },
+    {
+      title: 'Anillo 2 (Cian): ℤ Enteros',
+      kidText: 'Metemos al 0 y a los negativos (-1, -2, -3...), como pisos del subsuelo o temperatura bajo cero.'
+    },
+    {
+      title: 'Anillo 3 (Violeta): ℚ Racionales',
+      kidText: 'Sumamos las fracciones y decimales (1/2, 0,75) para poder partir una pizza en pedazos.'
+    },
+    {
+      title: 'Anillo 4 (Dorado): ℝ Reales + Distancia',
+      kidText: 'Completamos con números infinitos como π y √2. La V rosa muestra la distancia |x - c|.'
+    }
+  ],
+  powers3d: [
+    {
+      title: 'Paso 1: a¹ (Una línea)',
+      kidText: 'Elevar a la 1 es dejar el número tal cual: es solo una línea de largo "a".'
+    },
+    {
+      title: 'Paso 2: a² (Un cuadrado)',
+      kidText: 'Elevar al cuadrado (a × a) arma un piso plano cuadrado de ancho "a" y alto "a".'
+    },
+    {
+      title: 'Paso 3: a³ (Un cubo 3D)',
+      kidText: 'Elevar al cubo (a × a × a) le da profundidad: ¡ahora tenés un dado o caja 3D!'
+    }
+  ],
+  cube3d: [
+    {
+      title: 'Pieza 1 (Cian): El cubo grande a³',
+      kidText: 'Arrancamos con un cubo de lado "a". Pero si el lado mide (a + b), todavía falta mucho volumen.'
+    },
+    {
+      title: 'Pieza 2 (Verde): 3 placas planas a²b',
+      kidText: 'Pegamos 3 placas de grosor "b" en tres caras del cubo grande.'
+    },
+    {
+      title: 'Pieza 3 (Violeta): 3 barras largas ab²',
+      kidText: 'Rellenamos los 3 bordes que quedaron huecos con 3 barras alargadas.'
+    },
+    {
+      title: 'Pieza 4 (Dorado): El cubito b³',
+      kidText: 'Cerramos la esquina con el cubito b³. Por eso (a+b)³ tiene 8 piezas y NO es solo a³ + b³.'
+    }
+  ],
+  helix3d: [
+    {
+      title: 'Paso 1: El Círculo Unitario',
+      kidText: 'Una rueda perfecta de radio 1 donde gira la aguja del ángulo.'
+    },
+    {
+      title: 'Paso 2: El Triángulo adentro',
+      kidText: 'La altura rosa es el SENO (arriba/abajo) y la base cian es el COSENO (izquierda/derecha).'
+    },
+    {
+      title: 'Paso 3: La Hélice en 3D',
+      kidText: 'Si la rueda avanza hacia adelante mientras gira, dibuja un resorte dorado en el espacio.'
+    },
+    {
+      title: 'Paso 4: Ondas Seno y Coseno',
+      kidText: 'Mirando el resorte desde el costado ves la onda del Seno; desde abajo ves la del Coseno.'
+    }
+  ]
+};
+
 export const SCENE_META: Record<
   Scene3DKind,
   {
@@ -282,6 +353,9 @@ export default function Math3DScene({
   const [paramA, setParamA] = useState<number>(meta.defaultA);
   const [paramB, setParamB] = useState<number>(meta.defaultB);
   const [autoRotate, setAutoRotate] = useState<boolean>(true);
+  const buildSteps = SCENE_BUILD_STEPS[kind];
+  const [buildStep, setBuildStep] = useState<number>(0);
+  const [autoBuild, setAutoBuild] = useState<boolean>(true);
 
   useEffect(() => {
     setKind(defaultKind);
@@ -291,8 +365,19 @@ export default function Math3DScene({
     const nextMeta = SCENE_META[kind];
     setParamA(nextMeta.defaultA);
     setParamB(nextMeta.defaultB);
+    setBuildStep(0);
+    setAutoBuild(true);
     onKindChange?.(kind);
   }, [kind, onKindChange]);
+
+  // Avanza paso a paso automáticamente para enseñar anillo por anillo / pieza por pieza
+  useEffect(() => {
+    if (!autoBuild || !buildSteps || buildSteps.length <= 1) return;
+    const timer = window.setInterval(() => {
+      setBuildStep((prev) => (prev + 1) % buildSteps.length);
+    }, 3000);
+    return () => window.clearInterval(timer);
+  }, [autoBuild, buildSteps]);
 
   // Subtle reactive animation when switching theory/step blocks
   useEffect(() => {
@@ -312,10 +397,10 @@ export default function Math3DScene({
   const draggingRef = useRef(false);
   const lastRef = useRef<{ x: number; y: number } | null>(null);
 
-  const stateRef = useRef({ kind, paramA, paramB, autoRotate, activeStep });
+  const stateRef = useRef({ kind, paramA, paramB, autoRotate, activeStep, buildStep });
   useEffect(() => {
-    stateRef.current = { kind, paramA, paramB, autoRotate, activeStep };
-  }, [kind, paramA, paramB, autoRotate, activeStep]);
+    stateRef.current = { kind, paramA, paramB, autoRotate, activeStep, buildStep };
+  }, [kind, paramA, paramB, autoRotate, activeStep, buildStep]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -401,7 +486,7 @@ export default function Math3DScene({
 
     const render = () => {
       const time = (performance.now() - start) / 1000;
-      const { kind: k, paramA: a, paramB: b, autoRotate: auto } = stateRef.current;
+      const { kind: k, paramA: a, paramB: b, autoRotate: auto, buildStep: bStep } = stateRef.current;
       const reduced =
         typeof document !== 'undefined' &&
         document.documentElement.classList.contains('reduce-motion');
@@ -464,6 +549,7 @@ export default function Math3DScene({
           for (let iy = 0; iy < 2; iy++) {
             for (let iz = 0; iz < 2; iz++) {
               const countB = ix + iy + iz;
+              if (countB > bStep) continue; // Construir pieza por pieza!
               const rgb =
                 countB === 0
                   ? '34, 211, 238' // a^3 cyan
@@ -528,68 +614,77 @@ export default function Math3DScene({
         // Right triangle on unit circle
         const px = Math.cos(rad) * R;
         const py = Math.sin(rad) * R;
-        drawSeg({ x: 0, y: 0, z: z0 }, { x: px, y: py, z: z0 }, '#fde047', 2.4, 12);
-        drawSeg({ x: 0, y: 0, z: z0 }, { x: px, y: 0, z: z0 }, '#22d3ee', 2.2);
-        drawSeg({ x: px, y: 0, z: z0 }, { x: px, y: py, z: z0 }, '#fb7185', 2.2);
-        drawDot({ x: px, y: py, z: z0 }, 4, '#fde047', 14);
+        if (bStep >= 1) {
+          drawSeg({ x: 0, y: 0, z: z0 }, { x: px, y: py, z: z0 }, '#fde047', 2.4, 12);
+          drawSeg({ x: 0, y: 0, z: z0 }, { x: px, y: 0, z: z0 }, '#22d3ee', 2.2);
+          drawSeg({ x: px, y: 0, z: z0 }, { x: px, y: py, z: z0 }, '#fb7185', 2.2);
+          drawDot({ x: px, y: py, z: z0 }, 4, '#fde047', 14);
+        }
 
         // 3D Helix + orthogonal projections
-        const steps = 90;
-        for (let i = 0; i < steps; i++) {
-          const t1 = (i / steps) * turns * Math.PI * 2 + rad;
-          const t2 = ((i + 1) / steps) * turns * Math.PI * 2 + rad;
-          const z1 = z0 + (i / steps) * 6.8;
-          const z2 = z0 + ((i + 1) / steps) * 6.8;
-          drawSeg(
-            { x: Math.cos(t1) * R, y: Math.sin(t1) * R, z: z1 },
-            { x: Math.cos(t2) * R, y: Math.sin(t2) * R, z: z2 },
-            'rgba(253, 224, 71, 0.85)',
-            2.1,
-            8
-          );
-          // sin wave on YZ plane
-          drawSeg(
-            { x: -3.6, y: Math.sin(t1) * R, z: z1 },
-            { x: -3.6, y: Math.sin(t2) * R, z: z2 },
-            'rgba(251, 113, 133, 0.65)',
-            1.5
-          );
-          // cos wave on XZ plane
-          drawSeg(
-            { x: Math.cos(t1) * R, y: -3.2, z: z1 },
-            { x: Math.cos(t2) * R, y: -3.2, z: z2 },
-            'rgba(34, 211, 238, 0.65)',
-            1.5
-          );
+        if (bStep >= 2) {
+          const steps = 90;
+          for (let i = 0; i < steps; i++) {
+            const t1 = (i / steps) * turns * Math.PI * 2 + rad;
+            const t2 = ((i + 1) / steps) * turns * Math.PI * 2 + rad;
+            const z1 = z0 + (i / steps) * 6.8;
+            const z2 = z0 + ((i + 1) / steps) * 6.8;
+            drawSeg(
+              { x: Math.cos(t1) * R, y: Math.sin(t1) * R, z: z1 },
+              { x: Math.cos(t2) * R, y: Math.sin(t2) * R, z: z2 },
+              'rgba(253, 224, 71, 0.85)',
+              2.1,
+              8
+            );
+            if (bStep >= 3) {
+              // sin wave on YZ plane
+              drawSeg(
+                { x: -3.6, y: Math.sin(t1) * R, z: z1 },
+                { x: -3.6, y: Math.sin(t2) * R, z: z2 },
+                'rgba(251, 113, 133, 0.65)',
+                1.5
+              );
+              // cos wave on XZ plane
+              drawSeg(
+                { x: Math.cos(t1) * R, y: -3.2, z: z1 },
+                { x: Math.cos(t2) * R, y: -3.2, z: z2 },
+                'rgba(34, 211, 238, 0.65)',
+                1.5
+              );
+            }
+          }
         }
       } else if (k === 'powers3d') {
         // 3D Power Stack: a^1 (line), a^2 (square), a^3 (cube)
         const s = a;
-        const exp = Math.round(b);
+        const exp = Math.max(Math.round(b), bStep + 1);
         const faces: Face3D[] = [];
         // a^1 bar
         pushBox(faces, -3.0, -2.5 + s / 2, 0, 0.35, s, 0.35, '34, 211, 238', yawRef.current, pitchRef.current, zoomRef.current, width, height);
-        if (exp >= 2) {
+        if (bStep >= 1 && exp >= 2) {
           // a^2 plate
           pushBox(faces, -0.3, -2.5 + s / 2, 0, s, s, 0.3, '167, 139, 250', yawRef.current, pitchRef.current, zoomRef.current, width, height);
         }
-        if (exp >= 3) {
+        if (bStep >= 2 && exp >= 3) {
           // a^3 cube
           pushBox(faces, 2.7, -2.5 + s / 2, 0, s, s, s, '253, 224, 71', yawRef.current, pitchRef.current, zoomRef.current, width, height);
         }
         renderFaces(faces);
         drawText3D({ x: -3.2, y: -2.8, z: 0.4 }, 'a¹', '#22d3ee');
-        if (exp >= 2) drawText3D({ x: -0.5, y: -2.8, z: 0.4 }, 'a²', '#a78bfa');
-        if (exp >= 3) drawText3D({ x: 2.5, y: -2.8, z: 1.5 }, 'a³', '#fde047');
+        if (bStep >= 1 && exp >= 2) drawText3D({ x: -0.5, y: -2.8, z: 0.4 }, 'a²', '#a78bfa');
+        if (bStep >= 2 && exp >= 3) drawText3D({ x: 2.5, y: -2.8, z: 1.5 }, 'a³', '#fde047');
       } else if (k === 'sets3d') {
-        // Concentric rings for N ⊂ Z ⊂ Q ⊂ R + |x - c| <= r distance cone
+        // Concentric rings built RING BY RING (bStep 0..3)
         const rings = [
-          { r: 0.9, y: -1.8, color: '#34d399', label: 'ℕ' },
-          { r: 1.7, y: -1.2, color: '#22d3ee', label: 'ℤ' },
-          { r: 2.5, y: -0.6, color: '#a78bfa', label: 'ℚ' },
-          { r: 3.3, y: 0.0, color: '#fde047', label: 'ℝ' }
+          { r: 0.9, y: -1.8, color: '#34d399', label: 'ℕ (Contar)' },
+          { r: 1.7, y: -1.2, color: '#22d3ee', label: 'ℤ (Negativos)' },
+          { r: 2.5, y: -0.6, color: '#a78bfa', label: 'ℚ (Fracciones)' },
+          { r: 3.3, y: 0.0, color: '#fde047', label: 'ℝ (Todos)' }
         ];
-        for (const ring of rings) {
+        const visibleCount = Math.min(rings.length, bStep + 1);
+        for (let idx = 0; idx < visibleCount; idx++) {
+          const ring = rings[idx];
+          const isCurrent = idx === visibleCount - 1;
           for (let i = 0; i < 36; i++) {
             const t1 = (i / 36) * Math.PI * 2 + time * 0.2;
             const t2 = ((i + 1) / 36) * Math.PI * 2 + time * 0.2;
@@ -597,19 +692,22 @@ export default function Math3DScene({
               { x: Math.cos(t1) * ring.r, y: ring.y, z: Math.sin(t1) * ring.r },
               { x: Math.cos(t2) * ring.r, y: ring.y, z: Math.sin(t2) * ring.r },
               ring.color,
-              1.6
+              isCurrent ? 3.2 : 1.4,
+              isCurrent ? 14 : 0
             );
           }
-          drawText3D({ x: ring.r + 0.1, y: ring.y, z: 0 }, ring.label, ring.color);
+          drawText3D({ x: ring.r + 0.15, y: ring.y, z: 0 }, ring.label, ring.color);
         }
-        // Absolute value V-cone: y = |x - a| with cut at y = b
-        const leftX = a - b;
-        const rightX = a + b;
-        drawSeg({ x: -4, y: Math.abs(-4 - a) * 0.7 + 0.3, z: 0 }, { x: a, y: 0.3, z: 0 }, '#fb7185', 2.2, 10);
-        drawSeg({ x: a, y: 0.3, z: 0 }, { x: 4, y: Math.abs(4 - a) * 0.7 + 0.3, z: 0 }, '#fb7185', 2.2, 10);
-        drawSeg({ x: leftX, y: b * 0.7 + 0.3, z: 0 }, { x: rightX, y: b * 0.7 + 0.3, z: 0 }, '#34d399', 2.5, 14);
-        drawDot({ x: leftX, y: b * 0.7 + 0.3, z: 0 }, 3.8, '#34d399');
-        drawDot({ x: rightX, y: b * 0.7 + 0.3, z: 0 }, 3.8, '#34d399');
+        // Absolute value V-cone appears on step 4 (bStep >= 3)
+        if (bStep >= 3) {
+          const leftX = a - b;
+          const rightX = a + b;
+          drawSeg({ x: -4, y: Math.abs(-4 - a) * 0.7 + 0.3, z: 0 }, { x: a, y: 0.3, z: 0 }, '#fb7185', 2.2, 10);
+          drawSeg({ x: a, y: 0.3, z: 0 }, { x: 4, y: Math.abs(4 - a) * 0.7 + 0.3, z: 0 }, '#fb7185', 2.2, 10);
+          drawSeg({ x: leftX, y: b * 0.7 + 0.3, z: 0 }, { x: rightX, y: b * 0.7 + 0.3, z: 0 }, '#34d399', 2.5, 14);
+          drawDot({ x: leftX, y: b * 0.7 + 0.3, z: 0 }, 3.8, '#34d399');
+          drawDot({ x: rightX, y: b * 0.7 + 0.3, z: 0 }, 3.8, '#34d399');
+        }
       } else if (k === 'parabola3d') {
         // 3D Parabola surface z-extruded: y = a*x^2 + b
         const coefA = Math.abs(a) < 0.08 ? 0.1 : a;
@@ -833,6 +931,37 @@ export default function Math3DScene({
           <span>rueda · zoom</span>
         </div>
       </div>
+
+      {buildSteps && buildSteps.length > 0 ? (
+        <div className="math3d-build-box">
+          <div className="math3d-build-head">
+            <strong>{buildSteps[buildStep]?.title}</strong>
+            <div className="preset-row">
+              <button
+                type="button"
+                className={`chip ${autoBuild ? 'active' : ''}`}
+                onClick={() => setAutoBuild((v) => !v)}
+              >
+                {autoBuild ? '⏸ Pausar pasos' : '▶ Animar paso a paso'}
+              </button>
+              {buildSteps.map((st, idx) => (
+                <button
+                  key={st.title}
+                  type="button"
+                  className={`chip ${buildStep === idx ? 'active' : ''}`}
+                  onClick={() => {
+                    setAutoBuild(false);
+                    setBuildStep(idx);
+                  }}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+          <p>{buildSteps[buildStep]?.kidText}</p>
+        </div>
+      ) : null}
 
       {meta.legend ? (
         <div className="math3d-legend">

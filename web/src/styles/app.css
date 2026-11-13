@@ -1948,3 +1948,29 @@ button:focus-visible, a:focus-visible { outline: 2px solid rgba(34, 211, 238, 0.
 @media (max-width: 820px) {
   .memory-grid { grid-template-columns: 1fr; }
 }
+
+.math3d-build-box {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: rgba(15, 23, 42, 0.72);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.math3d-build-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.math3d-build-box p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
