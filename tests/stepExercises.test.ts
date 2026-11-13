@@ -3,19 +3,23 @@ import assert from 'node:assert/strict';
 import {
   ALL_STEP_EXERCISES,
   CHALLENGE_EXERCISES,
+  FOUNDATION_EXERCISES,
   SIMPLE_EXERCISES,
   reviewAnswerWithAI
 } from '../web/src/data/stepExercises.ts';
 
-test('Pasos Simples 10+10: estructura completa de 20 ejercicios', () => {
+test('Pasos Simples 0→2: estructura completa de 30 ejercicios (10+10+10)', () => {
+  assert.equal(FOUNDATION_EXERCISES.length, 10);
   assert.equal(SIMPLE_EXERCISES.length, 10);
   assert.equal(CHALLENGE_EXERCISES.length, 10);
-  assert.equal(ALL_STEP_EXERCISES.length, 20);
+  assert.equal(ALL_STEP_EXERCISES.length, 30);
 
   const ids = new Set(ALL_STEP_EXERCISES.map((ex) => ex.id));
-  assert.equal(ids.size, 20);
+  assert.equal(ids.size, 30);
 
   for (const ex of ALL_STEP_EXERCISES) {
+    assert.ok(ex.guide.length > 15, `Falta guía clara en ${ex.id}`);
+    assert.ok(ex.miniExample.length > 10, `Falta mini ejemplo en ${ex.id}`);
     assert.ok(ex.steps.length >= 1, `Faltan pasos en ${ex.id}`);
     assert.ok(ex.acceptedAnswers.length >= 1, `Faltan respuestas en ${ex.id}`);
     const res = reviewAnswerWithAI(ex, ex.canonicalAnswer);

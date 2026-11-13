@@ -1,4 +1,4 @@
-export type StepSeriesId = 'simple' | 'challenge';
+export type StepSeriesId = 'zero' | 'simple' | 'challenge';
 
 export interface StepSolutionItem {
   title: string;
@@ -151,6 +151,230 @@ export function reviewAnswerWithAI(exercise: StepExercise, rawInput: string): AI
 }
 
 const L = String.raw;
+
+export const FOUNDATION_EXERCISES: StepExercise[] = [
+  {
+    id: 'zero-01',
+    series: 'zero',
+    order: 1,
+    topic: 'Sumar negativos',
+    prompt: L`Calculá $-5 + 8$:`,
+    guide: 'Pensalo como plata: el -5 es que debés $5, y el +8 es que tenés $8. Pagás los $5 y te sobra plata a favor.',
+    miniExample: 'Ejemplo parecido: -3 + 10 = 7 (debía 3, pagué con 10, me quedan 7).',
+    placeholder: 'Ej: 3',
+    canonicalAnswer: '3',
+    acceptedAnswers: ['3', '+3'],
+    numericValue: 3,
+    hint: '8 - 5 = 3, y queda positivo porque el 8 es más grande.',
+    steps: [
+      { title: 'Restá los valores', detail: 'Como tienen distinto signo, restamos 8 - 5 = 3.' },
+      { title: 'Elegí el signo del mayor', detail: 'El 8 es positivo y más grande que 5, así que queda +3.', latex: L`-5 + 8 = 3` }
+    ],
+    commonMistakes: [
+      { matchValues: ['-13', '13'], diagnosis: 'Sumaste 5 + 8 como si tuvieran el mismo signo. Cuando uno es negativo y otro positivo, se restan.' },
+      { matchValues: ['-3'], diagnosis: 'El resultado es 3, pero positivo porque +8 es más grande que -5.' }
+    ],
+    xp: 10
+  },
+  {
+    id: 'zero-02',
+    series: 'zero',
+    order: 2,
+    topic: 'Signos al multiplicar',
+    prompt: L`Calculá $(-4) \cdot (-3)$:`,
+    guide: 'Al multiplicar: signos iguales siempre dan positivo (+), signos distintos siempre dan negativo (-).',
+    miniExample: 'Ejemplo parecido: (-2) · (-5) = +10.',
+    placeholder: 'Ej: 12',
+    canonicalAnswer: '12',
+    acceptedAnswers: ['12', '+12'],
+    numericValue: 12,
+    hint: '4 × 3 = 12, y menos por menos da más.',
+    steps: [
+      { title: 'Multiplicá los números', detail: '4 × 3 = 12.' },
+      { title: 'Aplicá regla de signos', detail: 'Negativo por negativo da positivo.', latex: L`(-4)\cdot(-3) = 12` }
+    ],
+    commonMistakes: [
+      { matchValues: ['-12'], diagnosis: 'En la multiplicación, menos por menos da MÁS (+12). Solo da negativo cuando los signos son distintos.' }
+    ],
+    xp: 10
+  },
+  {
+    id: 'zero-03',
+    series: 'zero',
+    order: 3,
+    topic: 'Orden de operaciones',
+    prompt: L`Calculá $2 + 3 \cdot 4$:`,
+    guide: 'Regla de oro: los signos + y - separan en términos. Primero resolvés multiplicaciones y divisiones, al final sumás.',
+    miniExample: 'Ejemplo parecido: 5 + 2 · 3 = 5 + 6 = 11 (NO 7 · 3).',
+    placeholder: 'Ej: 14',
+    canonicalAnswer: '14',
+    acceptedAnswers: ['14'],
+    numericValue: 14,
+    hint: 'Hacé primero 3 × 4 = 12, y después sumale 2.',
+    steps: [
+      { title: 'Separá en términos', detail: 'Primero multiplicamos 3 · 4 = 12.', latex: L`2 + (3\cdot 4) = 2 + 12` },
+      { title: 'Sumá al final', detail: '2 + 12 = 14.', latex: L`2 + 12 = 14` }
+    ],
+    commonMistakes: [
+      { matchValues: ['20'], diagnosis: 'Sumaste 2 + 3 = 5 antes de multiplicar por 4. La multiplicación siempre va primero que la suma.' }
+    ],
+    xp: 10
+  },
+  {
+    id: 'zero-04',
+    series: 'zero',
+    order: 4,
+    topic: 'Fracciones básicas',
+    prompt: L`Calculá $\frac{1}{2} + \frac{1}{4}$ (escribilo como fracción ` + '`a/b`' + ` o decimal):`,
+    guide: 'Pensalo en porciones: 1/2 es media pizza (equivale a 2 cuartos: 2/4). Si a 2/4 le sumás 1/4, tenés 3/4.',
+    miniExample: 'Ejemplo parecido: 1/2 + 1/2 = 2/2 = 1.',
+    placeholder: 'Ej: 3/4 o 0.75',
+    canonicalAnswer: '3/4',
+    acceptedAnswers: ['3/4', '0.75'],
+    numericValue: 0.75,
+    hint: 'Convertí 1/2 en 2/4 para que tengan el mismo número abajo.',
+    steps: [
+      { title: 'Igualá el denominador', detail: '1/2 es lo mismo que 2/4.', latex: L`\frac{1}{2} = \frac{2}{4}` },
+      { title: 'Sumá los de arriba', detail: '2/4 + 1/4 = 3/4.', latex: L`\frac{2}{4}+\frac{1}{4}=\frac{3}{4}` }
+    ],
+    commonMistakes: [
+      { matchValues: ['2/6', '1/3'], diagnosis: 'Sumaste los de arriba y los de abajo (1+1)/(2+4). ¡Los de abajo nunca se suman directo!' }
+    ],
+    xp: 10
+  },
+  {
+    id: 'zero-05',
+    series: 'zero',
+    order: 5,
+    topic: 'Multiplicar fracciones',
+    prompt: L`Calculá $\frac{2}{3} \cdot \frac{3}{5}$ (escribilo como fracción ` + '`a/b`' + ` o decimal):`,
+    guide: 'Multiplicar fracciones es lo más fácil: se multiplica derecho (arriba por arriba, abajo por abajo).',
+    miniExample: 'Ejemplo parecido: (1/2) · (3/4) = (1·3)/(2·4) = 3/8.',
+    placeholder: 'Ej: 2/5 o 0.4',
+    canonicalAnswer: '2/5',
+    acceptedAnswers: ['2/5', '6/15', '0.4'],
+    numericValue: 0.4,
+    hint: '2 × 3 = 6 arriba, y 3 × 5 = 15 abajo (6/15 simplificado por 3 es 2/5).',
+    steps: [
+      { title: 'Multiplicá derecho', detail: 'Numerador por numerador y denominador por denominador.', latex: L`\frac{2\cdot 3}{3\cdot 5} = \frac{6}{15}` },
+      { title: 'Simplificá por 3', detail: 'Dividimos arriba y abajo por 3.', latex: L`\frac{6}{15} = \frac{2}{5}` }
+    ],
+    commonMistakes: [
+      { matchValues: ['10/9'], diagnosis: 'Multiplicaste cruzado en lugar de derecho. En la multiplicación es arriba×arriba y abajo×abajo.' }
+    ],
+    xp: 10
+  },
+  {
+    id: 'zero-06',
+    series: 'zero',
+    order: 6,
+    topic: 'Porcentajes',
+    prompt: L`¿Cuánto es el $50\%$ de $80$?`,
+    guide: 'El 100% es el total completo. El 50% es exactamente la mitad (dividir por 2). El 25% es la cuarta parte (dividir por 4).',
+    miniExample: 'Ejemplo parecido: el 50% de 60 es 60 ÷ 2 = 30.',
+    placeholder: 'Ej: 40',
+    canonicalAnswer: '40',
+    acceptedAnswers: ['40'],
+    numericValue: 40,
+    hint: 'Dividí 80 por 2.',
+    steps: [
+      { title: 'Traducí 50%', detail: '50/100 es lo mismo que 1/2 (la mitad).', latex: L`50\% = \frac{1}{2}` },
+      { title: 'Calculá la mitad', detail: '80 ÷ 2 = 40.', latex: L`\frac{80}{2} = 40` }
+    ],
+    commonMistakes: [
+      { matchValues: ['30'], diagnosis: 'Restaste 80 - 50 = 30 en lugar de calcular la mitad de 80.' }
+    ],
+    xp: 10
+  },
+  {
+    id: 'zero-07',
+    series: 'zero',
+    order: 7,
+    topic: 'Qué es una incógnita',
+    prompt: L`Si $x + 4 = 10$, ¿qué número esconde la $x$?`,
+    guide: 'La letra x es solo una cajita vacía con un número escondido adentro. Preguntate: ¿qué número más 4 da 10?',
+    miniExample: 'Ejemplo parecido: si x + 2 = 7, la cajita esconde al 5 (porque 5 + 2 = 7).',
+    placeholder: 'Ej: 6',
+    canonicalAnswer: '6',
+    acceptedAnswers: ['6'],
+    numericValue: 6,
+    hint: 'Al 10 restale 4.',
+    steps: [
+      { title: 'Pensá qué falta', detail: '¿Qué número + 4 = 10?', latex: L`x = 10 - 4` },
+      { title: 'Verificá', detail: '6 + 4 = 10.', latex: L`x = 6` }
+    ],
+    commonMistakes: [
+      { matchValues: ['14'], diagnosis: 'Sumaste 10 + 4 en lugar de restar 10 - 4.' }
+    ],
+    xp: 10
+  },
+  {
+    id: 'zero-08',
+    series: 'zero',
+    order: 8,
+    topic: 'Potencia desde cero',
+    prompt: L`Calculá $2^3$:`,
+    guide: 'El número chiquito de arriba (3) te dice cuántas veces multiplicás el número grande (2) por sí mismo: 2 · 2 · 2.',
+    miniExample: 'Ejemplo parecido: 3² = 3 · 3 = 9 (NO es 3 · 2).',
+    placeholder: 'Ej: 8',
+    canonicalAnswer: '8',
+    acceptedAnswers: ['8'],
+    numericValue: 8,
+    hint: '2 × 2 = 4, y 4 × 2 = 8.',
+    steps: [
+      { title: 'Escribí la multiplicación', detail: 'El 2 aparece 3 veces multiplicándose.', latex: L`2^3 = 2 \cdot 2 \cdot 2` },
+      { title: 'Calculá paso a paso', detail: '2 × 2 = 4, y 4 × 2 = 8.', latex: L`2^3 = 8` }
+    ],
+    commonMistakes: [
+      { matchValues: ['6'], diagnosis: 'Multiplicaste 2 × 3 = 6. Recordá que la potencia repite multiplicaciones (2×2×2), no multiplica base por exponente.' }
+    ],
+    xp: 10
+  },
+  {
+    id: 'zero-09',
+    series: 'zero',
+    order: 9,
+    topic: 'Raíz cuadrada desde cero',
+    prompt: L`Calculá $\sqrt{25}$:`,
+    guide: 'La raíz cuadrada es lo contrario de elevar al cuadrado: buscá qué número positivo multiplicado por sí mismo da 25.',
+    miniExample: 'Ejemplo parecido: √16 = 4 porque 4 × 4 = 16.',
+    placeholder: 'Ej: 5',
+    canonicalAnswer: '5',
+    acceptedAnswers: ['5'],
+    numericValue: 5,
+    hint: 'Probá 3×3=9, 4×4=16, 5×5=...',
+    steps: [
+      { title: 'Buscá el número', detail: '5 × 5 = 25.', latex: L`5^2 = 25` },
+      { title: 'Escribí la raíz', detail: 'Por lo tanto √25 = 5.', latex: L`\sqrt{25} = 5` }
+    ],
+    commonMistakes: [
+      { matchValues: ['12.5', '25/2'], diagnosis: 'Dividiste por 2 en vez de buscar qué número multiplicado por sí mismo da 25.' }
+    ],
+    xp: 10
+  },
+  {
+    id: 'zero-10',
+    series: 'zero',
+    order: 10,
+    topic: 'Regla de tres simple',
+    prompt: L`Si $2$ cuadernos cuestan $\$100$, ¿cuánto cuestan $5$ cuadernos?`,
+    guide: 'Primero averiguá cuánto cuesta 1 solo cuaderno (dividiendo 100 ÷ 2), y después multiplicá ese precio por 5.',
+    miniExample: 'Ejemplo parecido: 3 lápices cuestan $30 → 1 lápiz cuesta $10 → 4 lápices cuestan $40.',
+    placeholder: 'Ej: 250',
+    canonicalAnswer: '250',
+    acceptedAnswers: ['250', '$250'],
+    numericValue: 250,
+    hint: '1 cuaderno sale $50. ¿Cuánto salen 5?',
+    steps: [
+      { title: 'Calculá el valor de 1 unidad', detail: '100 ÷ 2 = $50 cada cuaderno.', latex: L`\frac{100}{2} = 50` },
+      { title: 'Multiplicá por 5', detail: '50 × 5 = 250.', latex: L`50 \cdot 5 = 250` }
+    ],
+    commonMistakes: [
+      { matchValues: ['50'], diagnosis: '50 es el precio de 1 cuaderno. Falta multiplicarlo por los 5 cuadernos.' }
+    ],
+    xp: 15
+  }
+];
 
 export const SIMPLE_EXERCISES: StepExercise[] = [
   {
@@ -601,4 +825,8 @@ export const CHALLENGE_EXERCISES: StepExercise[] = [
   }
 ];
 
-export const ALL_STEP_EXERCISES: StepExercise[] = [...SIMPLE_EXERCISES, ...CHALLENGE_EXERCISES];
+export const ALL_STEP_EXERCISES: StepExercise[] = [
+  ...FOUNDATION_EXERCISES,
+  ...SIMPLE_EXERCISES,
+  ...CHALLENGE_EXERCISES
+];

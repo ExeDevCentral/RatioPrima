@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   CHALLENGE_EXERCISES,
+  FOUNDATION_EXERCISES,
   SIMPLE_EXERCISES,
   reviewAnswerWithAI,
   type AIReviewResult,
@@ -18,7 +19,7 @@ const KEYPAD_KEYS = ['7', '8', '9', '/', '4', '5', '6', '-', '1', '2', '3', '.',
 
 export default function StepsPracticeView() {
   const { recordQuestion, pushToast } = useLearning();
-  const [series, setSeries] = useState<StepSeriesId>('simple');
+  const [series, setSeries] = useState<StepSeriesId>('zero');
   const [index, setIndex] = useState(0);
   const [inputs, setInputs] = useState<Record<string, string>>({});
   const [reviews, setReviews] = useState<Record<string, AIReviewResult>>({});
@@ -28,7 +29,12 @@ export default function StepsPracticeView() {
   const scanTimerRef = useRef<number | null>(null);
 
   const list: StepExercise[] = useMemo(
-    () => (series === 'simple' ? SIMPLE_EXERCISES : CHALLENGE_EXERCISES),
+    () =>
+      series === 'zero'
+        ? FOUNDATION_EXERCISES
+        : series === 'simple'
+          ? SIMPLE_EXERCISES
+          : CHALLENGE_EXERCISES,
     [series]
   );
 
@@ -195,13 +201,24 @@ export default function StepsPracticeView() {
         <div className="steps-series-tabs">
           <button
             type="button"
+            className={`series-tab ${series === 'zero' ? 'active' : ''}`}
+            onClick={() => switchSeries('zero')}
+          >
+            <Icon name="orbit" size={16} />
+            <div>
+              <strong>Nivel 0 · Desde Cero</strong>
+              <small>10 ejercicios sin base previa</small>
+            </div>
+          </button>
+          <button
+            type="button"
             className={`series-tab ${series === 'simple' ? 'active' : ''}`}
             onClick={() => switchSeries('simple')}
           >
             <Icon name="bolt" size={16} />
             <div>
-              <strong>Serie 1 · Pasos Simples</strong>
-              <small>10 ejercicios directos</small>
+              <strong>Nivel 1 · Básico</strong>
+              <small>10 ejercicios del cursillo</small>
             </div>
           </button>
           <button
@@ -211,7 +228,7 @@ export default function StepsPracticeView() {
           >
             <Icon name="brain" size={16} />
             <div>
-              <strong>Serie 2 · Desafío Paso a Paso</strong>
+              <strong>Nivel 2 · Desafío</strong>
               <small>10 ejercicios de examen</small>
             </div>
           </button>
@@ -255,8 +272,12 @@ export default function StepsPracticeView() {
         <section className="panel steps-card">
           <div className="steps-card-top">
             <div className="preset-row">
-              <Pill color={series === 'simple' ? '#34d399' : '#a78bfa'}>
-                {series === 'simple' ? 'Nivel 1 · Básico' : 'Nivel 2 · Desafío'}
+              <Pill color={series === 'zero' ? '#22d3ee' : series === 'simple' ? '#34d399' : '#a78bfa'}>
+                {series === 'zero'
+                  ? 'Nivel 0 · Desde Cero'
+                  : series === 'simple'
+                    ? 'Nivel 1 · Básico'
+                    : 'Nivel 2 · Desafío'}
               </Pill>
               <Pill color="#22d3ee">{exercise.topic}</Pill>
             </div>
