@@ -12,6 +12,7 @@ import { useLearning } from '../state/LearningContext';
 import Icon from '../components/ui/Icon';
 import { Bar, Pill, SectionTitle } from '../components/ui/Primitives';
 import RichText, { FormulaCard } from '../components/ui/RichText';
+import MemoryAnchorCard from '../components/ui/MemoryAnchorCard';
 import { burstConfetti } from '../lib/fx';
 import { playClick, playLaser } from '../lib/sfx';
 
@@ -423,6 +424,8 @@ export default function StepsPracticeView() {
           )}
         </section>
       </div>
+
+      <MemoryAnchorCard key={exercise.topic} worldOrTopic={exercise.topic} compact />
     </div>
   );
 }

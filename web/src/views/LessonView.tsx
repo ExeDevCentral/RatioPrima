@@ -12,6 +12,7 @@ import { useLearning } from '../state/LearningContext';
 import Icon from '../components/ui/Icon';
 import { Bar, Pill, ProgressRing, SectionTitle } from '../components/ui/Primitives';
 import RichText, { FormulaCard } from '../components/ui/RichText';
+import MemoryAnchorCard from '../components/ui/MemoryAnchorCard';
 import LabRenderer, { LAB_META } from '../components/labs/LabRenderer';
 import Math3DScene from '../components/labs/Math3DScene';
 import GuidedAnimationStudio, { type StudioTopic } from '../components/labs/GuidedAnimationStudio';
@@ -234,6 +235,8 @@ export default function LessonView() {
                 <span>Si podés explicar el concepto con un ejemplo propio, ya lo aprendiste. Si no, volvé al laboratorio.</span>
               </div>
             </div>
+
+            <MemoryAnchorCard worldOrTopic={lesson.worldId} />
           </section>
 
           <aside className="lesson-side">
