@@ -31,6 +31,7 @@ export const SCENE_META: Record<
   {
     title: string;
     subtitle: string;
+    legend?: string;
     paramALabel: string;
     paramBLabel: string;
     defaultA: number;
@@ -46,6 +47,7 @@ export const SCENE_META: Record<
   sets3d: {
     title: 'Anillos Numéricos & Módulo 3D',
     subtitle: 'Inclusión ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ y cono de distancia |x - c| ≤ r',
+    legend: 'Anillos = ℕ (verde) ⊂ ℤ (cian) ⊂ ℚ (violeta) ⊂ ℝ (dorado) · V rosa = |x - c| · Barra verde = solución',
     paramALabel: 'centro c',
     paramBLabel: 'radio r',
     defaultA: 1.5,
@@ -831,6 +833,13 @@ export default function Math3DScene({
           <span>rueda · zoom</span>
         </div>
       </div>
+
+      {meta.legend ? (
+        <div className="math3d-legend">
+          <Icon name="eye" size={14} />
+          <span>{meta.legend}</span>
+        </div>
+      ) : null}
 
       {activeFormula ? (
         <div className="math3d-formula">

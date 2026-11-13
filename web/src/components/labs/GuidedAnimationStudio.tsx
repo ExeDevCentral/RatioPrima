@@ -710,6 +710,10 @@ export default function GuidedAnimationStudio({
             <div className="studio-time-pill">
               {elapsed.toFixed(1)}s / 10.0s
             </div>
+            <div className="studio-caption-overlay">
+              <strong>{currentCue.title}</strong>
+              <span>{currentCue.text}</span>
+            </div>
           </div>
 
           <div className="studio-timeline">

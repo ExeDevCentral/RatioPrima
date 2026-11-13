@@ -254,13 +254,27 @@ export default function StepsPracticeView() {
       <div className="steps-workspace">
         <section className="panel steps-card">
           <div className="steps-card-top">
-            <Pill color={series === 'simple' ? '#22d3ee' : '#a78bfa'}>{exercise.topic}</Pill>
+            <div className="preset-row">
+              <Pill color={series === 'simple' ? '#34d399' : '#a78bfa'}>
+                {series === 'simple' ? 'Nivel 1 · Básico' : 'Nivel 2 · Desafío'}
+              </Pill>
+              <Pill color="#22d3ee">{exercise.topic}</Pill>
+            </div>
             <span className="steps-kbd-hint">Tip: presioná <kbd>Enter</kbd> para revisar o avanzar</span>
           </div>
 
           <h2 className="steps-prompt">
             <RichText text={exercise.prompt} />
           </h2>
+
+          <div className="steps-guide-box">
+            <div className="steps-guide-head">
+              <Icon name="book" size={14} />
+              <strong>Cómo resolverlo (sin adivinar)</strong>
+            </div>
+            <p>{exercise.guide}</p>
+            <div className="steps-mini-example">{exercise.miniExample}</div>
+          </div>
 
           <div className={`steps-input-wrap ${scanning ? 'scanning' : ''} ${currentReview ? currentReview.tone : ''}`}>
             <input
