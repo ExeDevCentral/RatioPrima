@@ -106,7 +106,7 @@ test('Polymath Zero - REPL Engine: Proof, Test and Step Verification', () => {
 
   const testRes = evaluateReplCommand('test');
   assert.equal(testRes.ok, true);
-  assert.ok(testRes.output.includes('RESULTADO: 4/4 pruebas formales pasadas con éxito'));
+  assert.ok(testRes.output.includes('RESULTADO: 6/6 pruebas formales pasadas con éxito'));
 
   const stepRes = evaluateReplCommand('a + (-a) == 0', {
     currentFormula: 'a + (-a) == 0',
@@ -115,3 +115,4 @@ test('Polymath Zero - REPL Engine: Proof, Test and Step Verification', () => {
   assert.equal(stepRes.ok, true);
   assert.ok(stepRes.output.includes('True') || stepRes.output.includes('0 (Neutro aditivo)'));
 });
+

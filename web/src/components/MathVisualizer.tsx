@@ -8,6 +8,8 @@ interface MathVisualizerProps {
 export default function MathVisualizer({ exercise }: MathVisualizerProps) {
   // Estado para Límites Epsilon-Delta
   const [epsilon, setEpsilon] = useState<number>(0.6);
+  const [showProbePoint, setShowProbePoint] = useState<boolean>(true);
+  const [hoverCoord, setHoverCoord] = useState<{ x: number; y: number } | null>(null);
 
   // Estado para Álgebra Lineal / Vectores
   const [c1, setC1] = useState<number>(1);
@@ -39,6 +41,23 @@ export default function MathVisualizer({ exercise }: MathVisualizerProps) {
     const yBottom = L - epsilon;
     const yTop = L + epsilon;
 
+    const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clientX = e.clientX - rect.left;
+      const clientY = e.clientY - rect.top;
+      const svgX = (clientX / rect.width) * width;
+      const svgY = (clientY / rect.height) * height;
+
+      // Despejar x en [0, 4]
+      const mathX = ((svgX - padding) / (width - 2 * padding)) * 4;
+      const mathY = ((height - padding - svgY) / (height - 2 * padding)) * 8;
+      if (mathX >= 0 && mathX <= 4 && mathY >= 0 && mathY <= 8) {
+        setHoverCoord({ x: mathX, y: mathY });
+      } else {
+        setHoverCoord(null);
+      }
+    };
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', color: '#c9d1d9' }}>
         <div style={{
@@ -56,9 +75,23 @@ export default function MathVisualizer({ exercise }: MathVisualizerProps) {
               f(x) = 3x - 1 | x₀ = 2, L = 5 | Relación: δ = ε / 3
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button
+              onClick={() => setShowProbePoint(!showProbePoint)}
+              style={{
+                background: showProbePoint ? 'rgba(88, 166, 255, 0.15)' : '#21262d',
+                border: `1px solid ${showProbePoint ? '#58a6ff' : '#30363d'}`,
+                color: showProbePoint ? '#58a6ff' : '#8b949e',
+                fontSize: '11px',
+                padding: '3px 8px',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              {showProbePoint ? '● Punto Fijo' : '○ Ocultar'}
+            </button>
             <label style={{ fontSize: '12px', color: '#e5a93c' }}>
-              ε (tolerancia): <strong>{epsilon.toFixed(2)}</strong>
+              ε: <strong>{epsilon.toFixed(2)}</strong>
             </label>
             <input
               type="range"
@@ -67,7 +100,7 @@ export default function MathVisualizer({ exercise }: MathVisualizerProps) {
               step="0.05"
               value={epsilon}
               onChange={(e) => setEpsilon(parseFloat(e.target.value))}
-              style={{ width: '130px', accentColor: '#e5a93c' }}
+              style={{ width: '120px', accentColor: '#e5a93c' }}
             />
           </div>
         </div>
@@ -80,7 +113,12 @@ export default function MathVisualizer({ exercise }: MathVisualizerProps) {
           overflow: 'hidden',
           position: 'relative'
         }}>
-          <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: 'auto', display: 'block' }}>
+          <svg
+            viewBox={`0 0 ${width} ${height}`}
+            style={{ width: '100%', height: 'auto', display: 'block', cursor: 'crosshair' }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => setHoverCoord(null)}
+          >
             {/* Cuadrícula de fondo */}
             <defs>
               <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -141,7 +179,6 @@ export default function MathVisualizer({ exercise }: MathVisualizerProps) {
             ))}
 
             {/* Función f(x) = 3x - 1 */}
-            {/* Puntos para graficar de x=0.33 a x=3 */}
             <line
               x1={scaleX(0.5)}
               y1={scaleY(3 * 0.5 - 1)}
@@ -152,14 +189,61 @@ export default function MathVisualizer({ exercise }: MathVisualizerProps) {
             />
 
             {/* Punto Central (x0, L) = (2, 5) */}
-            <line x1={scaleX(x0)} y1={scaleY(L)} x2={scaleX(x0)} y2={height - padding} stroke="#e5a93c" strokeDasharray="3 3" />
-            <line x1={padding} y1={scaleY(L)} x2={scaleX(x0)} y2={scaleY(L)} stroke="#e5a93c" strokeDasharray="3 3" />
-            <circle cx={scaleX(x0)} cy={scaleY(L)} r="5" fill="#e5a93c" stroke="#0d1117" strokeWidth="1.5" />
+            {showProbePoint && (
+              <>
+                <line x1={scaleX(x0)} y1={scaleY(L)} x2={scaleX(x0)} y2={height - padding} stroke="#e5a93c" strokeDasharray="3 3" />
+                <line x1={padding} y1={scaleY(L)} x2={scaleX(x0)} y2={scaleY(L)} stroke="#e5a93c" strokeDasharray="3 3" />
+                <circle cx={scaleX(x0)} cy={scaleY(L)} r="5" fill="#e5a93c" stroke="#0d1117" strokeWidth="1.5" />
+                <text x={scaleX(x0) + 8} y={scaleY(L) - 8} fill="#e5a93c" fontSize="11" fontWeight="bold">
+                  (2, 5)
+                </text>
+              </>
+            )}
 
-            {/* Etiquetas del punto y cotas */}
-            <text x={scaleX(x0) + 8} y={scaleY(L) - 8} fill="#e5a93c" fontSize="11" fontWeight="bold">
-              (2, 5)
-            </text>
+            {/* Marcador Hover interactivo */}
+            {hoverCoord && (
+              <g>
+                <circle cx={scaleX(hoverCoord.x)} cy={scaleY(hoverCoord.y)} r="4" fill="#bc8cff" />
+                <line
+                  x1={scaleX(hoverCoord.x)}
+                  y1={padding}
+                  x2={scaleX(hoverCoord.x)}
+                  y2={height - padding}
+                  stroke="#bc8cff"
+                  strokeWidth="0.8"
+                  strokeDasharray="2 2"
+                />
+                <line
+                  x1={padding}
+                  y1={scaleY(hoverCoord.y)}
+                  x2={width - padding}
+                  y2={scaleY(hoverCoord.y)}
+                  stroke="#bc8cff"
+                  strokeWidth="0.8"
+                  strokeDasharray="2 2"
+                />
+                <rect
+                  x={Math.min(scaleX(hoverCoord.x) + 8, width - 130)}
+                  y={Math.max(scaleY(hoverCoord.y) - 26, padding + 4)}
+                  width="115"
+                  height="22"
+                  fill="#161b22"
+                  stroke="#bc8cff"
+                  rx="4"
+                />
+                <text
+                  x={Math.min(scaleX(hoverCoord.x) + 14, width - 124)}
+                  y={Math.max(scaleY(hoverCoord.y) - 11, padding + 19)}
+                  fill="#f0f6fc"
+                  fontSize="10"
+                  fontFamily="monospace"
+                >
+                  x:{hoverCoord.x.toFixed(2)}, y:{hoverCoord.y.toFixed(2)}
+                </text>
+              </g>
+            )}
+
+            {/* Etiquetas de cotas */}
             <text x={scaleX(xRight)} y={height - padding + 32} fill="#3fb950" fontSize="10" textAnchor="middle">
               2 + δ ({xRight.toFixed(2)})
             </text>

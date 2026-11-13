@@ -100,3 +100,4 @@ export default function KaTeXView({ math, block = false, className, children }: 
   }
   return <KaTeXInline math={target} className={className} />;
 }
+
