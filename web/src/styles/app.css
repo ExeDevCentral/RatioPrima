@@ -77,7 +77,7 @@ h1, h2, h3, h4, p { margin: 0; }
 .bg-glow-2 { width: 640px; height: 640px; right: -160px; bottom: -240px; background: rgba(167, 139, 250, 0.12); }
 
 .app-main { margin-left: 264px; min-height: 100vh; display: flex; flex-direction: column; }
-.app-content { flex: 1; width: 100%; max-width: 1380px; margin: 0 auto; padding: 30px 34px 60px; }
+.app-content { flex: 1; width: 100%; max-width: 1880px; margin: 0 auto; padding: 24px 28px 60px; }
 .app-footer {
   max-width: 1380px; width: 100%; margin: 0 auto; padding: 22px 34px 34px;
   display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
@@ -571,7 +571,7 @@ h1, h2, h3, h4, p { margin: 0; }
 .lesson-tab.active .lesson-tab-index { background: rgba(34, 211, 238, 0.16); }
 .lesson-tab em { font-style: normal; font-size: 9px; color: var(--faint); }
 
-.lesson-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.55fr); gap: 16px; align-items: start; }
+.lesson-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr); gap: 20px; align-items: start; }
 .lesson-theory { padding: 26px; }
 .theory-block { display: flex; gap: 16px; padding: 18px 0; border-top: 1px solid var(--border); }
 .theory-block:first-of-type { border-top: 0; padding-top: 4px; }
@@ -1203,8 +1203,8 @@ button:focus-visible, a:focus-visible { outline: 2px solid rgba(34, 211, 238, 0.
 /* ── Live 3D Math Creations (Teoría & Pasos Guiados) ───────────────────── */
 .lesson-steps-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(440px, 1fr);
+  gap: 20px;
   align-items: start;
 }
 .lesson-3d-panel.sticky {
@@ -1244,6 +1244,10 @@ button:focus-visible, a:focus-visible { outline: 2px solid rgba(34, 211, 238, 0.
   justify-content: space-between;
   gap: 10px;
 }
+.math3d-head .chip {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 .math3d-head h4 {
   font-size: 15px;
   margin: 2px 0 3px;
@@ -1264,12 +1268,12 @@ button:focus-visible, a:focus-visible { outline: 2px solid rgba(34, 211, 238, 0.
 .math3d-canvas {
   display: block;
   width: 100%;
-  height: 290px;
+  height: 380px;
   cursor: grab;
   touch-action: none;
 }
 .math3d-card.compact .math3d-canvas {
-  height: 230px;
+  height: 340px;
 }
 .math3d-canvas:active {
   cursor: grabbing;
@@ -1683,8 +1687,8 @@ button:focus-visible, a:focus-visible { outline: 2px solid rgba(34, 211, 238, 0.
 .cinema-header h1 { font-size: clamp(22px, 2.6vw, 30px); margin: 2px 0 0; }
 .cinema-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.85fr) minmax(320px, 0.95fr);
-  gap: 16px;
+  grid-template-columns: minmax(0, 1.45fr) minmax(380px, 0.95fr);
+  gap: 20px;
   align-items: stretch;
 }
 .cinema-stage-panel {
