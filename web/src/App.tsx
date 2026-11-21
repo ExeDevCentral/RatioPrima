@@ -146,11 +146,11 @@ function TopHUD({ onOpenSymbols }: { onOpenSymbols: () => void }) {
           type="button"
           className="hud-symbols-btn mobile"
           onClick={onOpenSymbols}
-          title="Glosario de símbolos matemáticos (Pág. 2)"
-          aria-label="Abrir glosario de símbolos matemáticos"
+          title="Diccionario académico, símbolos y mini tutor"
+          aria-label="Abrir diccionario matemático y tutor"
         >
           <span>∈ ∀</span>
-          <span>Símbolos</span>
+          <span>Guía · IA</span>
         </button>
       </div>
 
@@ -214,11 +214,11 @@ function TopHUD({ onOpenSymbols }: { onOpenSymbols: () => void }) {
           type="button"
           className="hud-symbols-btn"
           onClick={onOpenSymbols}
-          title="Glosario de símbolos matemáticos (Pág. 2)"
-          aria-label="Abrir glosario de símbolos matemáticos"
+          title="Diccionario con historia, símbolos (Pág. 2) y mini tutor"
+          aria-label="Abrir diccionario matemático y tutor"
         >
           <span className="hud-symbols-glyph" aria-hidden="true">∈ ∀</span>
-          <span>Símbolos</span>
+          <span>Diccionario &amp; IA</span>
         </button>
 
         <a className="hud-workbench" href="/workbench" title="Abrir el modo avanzado">

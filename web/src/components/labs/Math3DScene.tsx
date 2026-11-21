@@ -1066,12 +1066,15 @@ export default function Math3DScene({
         if (bStep >= 1 && exp >= 2) drawText3D({ x: -0.5, y: -2.8, z: 0.4 }, 'a²', '#a78bfa');
         if (bStep >= 2 && exp >= 3) drawText3D({ x: 2.5, y: -2.8, z: 1.5 }, 'a³', '#fde047');
       } else if (k === 'sets3d') {
-        // Concentric rings built RING BY RING (bStep 0..3) — spaced clearly with non-overlapping pills
+        // Explicit Y-axis meaning: rising upward = broader number system solving more equations
+        drawTag3D({ x: 0, y: 3.35, z: 0 }, '↑ Eje Y: más alcance (resuelve más problemas)', '#fde047', 0, -10, 11.5);
+
+        // Concentric rings built RING BY RING (bStep 0..3) — elevated, wide, with leader lines so pills NEVER overlap
         const rings = [
-          { r: 1.05, y: -2.05, color: '#34d399', label: 'ℕ (Contar)', side: -1, dx: -14, dy: 14 },
-          { r: 1.9, y: -1.1, color: '#22d3ee', label: 'ℤ (Negativos)', side: 1, dx: 14, dy: 8 },
-          { r: 2.75, y: -0.15, color: '#a78bfa', label: 'ℚ (Fracciones)', side: -1, dx: -14, dy: -6 },
-          { r: 3.55, y: 0.8, color: '#fde047', label: 'ℝ (Todos)', side: 1, dx: 14, dy: -12 }
+          { r: 1.05, y: -1.45, color: '#34d399', label: 'ℕ · Contar (1, 2, 3...)', side: -1 },
+          { r: 1.85, y: -0.35, color: '#22d3ee', label: 'ℤ · Negativos (3 − 5 = −2)', side: 1 },
+          { r: 2.65, y: 0.75, color: '#a78bfa', label: 'ℚ · Fracciones (3x = 2)', side: -1 },
+          { r: 3.45, y: 1.85, color: '#fde047', label: 'ℝ · Irracionales (√2, π)', side: 1 }
         ];
         const visibleCount = Math.min(rings.length, bStep + 1);
         for (let idx = 0; idx < visibleCount; idx++) {
@@ -1092,14 +1095,11 @@ export default function Math3DScene({
             );
           }
           if (grow > 0.35) {
-            drawTag3D(
-              { x: ring.side * (ring.r + 0.18), y: ring.y, z: 0 },
-              ring.label,
-              ring.color,
-              ring.dx,
-              ring.dy,
-              12
-            );
+            const edge = { x: ring.side * ring.r, y: ring.y, z: 0 };
+            const anchor = { x: ring.side * (ring.r + 1.15), y: ring.y, z: 0 };
+            drawSeg(edge, anchor, ring.color, 1.2, 0, [3, 4]);
+            drawDot(edge, 3.2, ring.color, 8);
+            drawTag3D(anchor, ring.label, ring.color, ring.side * 10, 0, 11.5);
           }
         }
         // Absolute value V-cone appears on step 4 (bStep >= 3)

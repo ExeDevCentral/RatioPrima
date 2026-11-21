@@ -204,51 +204,55 @@ export default function LessonView() {
       </nav>
 
       {phase === 'teoria' ? (
-        <div className="lesson-grid">
-          <section className="panel lesson-theory">
-            <SectionTitle eyebrow="Conceptos" title="Lo que tenés que entender" description="Tocá cada bloque para sincronizar la creación 3D en vivo." />
-            {lesson.theory.map((block, blockIndex) => (
-              <article
-                key={`${block.heading ?? 'block'}-${blockIndex}`}
-                className={`theory-block interactive ${activeTheory === blockIndex ? 'active' : ''}`}
-                onClick={() => setActiveTheory(blockIndex)}
-              >
-                <div className="theory-marker" style={{ background: `${color}22`, color }}>
-                  {String(blockIndex + 1).padStart(2, '0')}
-                </div>
+        <div className="lesson-teoria-stack">
+          <div className="lesson-grid">
+            <section className="panel lesson-theory">
+              <SectionTitle eyebrow="Conceptos" title="Lo que tenés que entender" description="Tocá cada bloque para sincronizar la creación 3D en vivo." />
+              {lesson.theory.map((block, blockIndex) => (
+                <article
+                  key={`${block.heading ?? 'block'}-${blockIndex}`}
+                  className={`theory-block interactive ${activeTheory === blockIndex ? 'active' : ''}`}
+                  onClick={() => setActiveTheory(blockIndex)}
+                >
+                  <div className="theory-marker" style={{ background: `${color}22`, color }}>
+                    {String(blockIndex + 1).padStart(2, '0')}
+                  </div>
+                  <div>
+                    {block.heading ? <h3>{block.heading}</h3> : null}
+                    <div className="theory-body"><RichText text={block.body} /></div>
+                    {block.note ? (
+                      <div className="theory-note">
+                        <Icon name="bulb" size={15} />
+                        <span><RichText text={block.note} /></span>
+                      </div>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+              <div className="lesson-callout" style={{ borderColor: `${color}44`, background: `${color}0d` }}>
+                <Icon name="brain" size={18} />
                 <div>
-                  {block.heading ? <h3>{block.heading}</h3> : null}
-                  <div className="theory-body"><RichText text={block.body} /></div>
-                  {block.note ? (
-                    <div className="theory-note">
-                      <Icon name="bulb" size={15} />
-                      <span><RichText text={block.note} /></span>
-                    </div>
-                  ) : null}
+                  <strong>Regla de oro</strong>
+                  <span>Si podés explicar el concepto con un ejemplo propio, ya lo aprendiste. Si no, volvé al laboratorio.</span>
                 </div>
-              </article>
-            ))}
-            <div className="lesson-callout" style={{ borderColor: `${color}44`, background: `${color}0d` }}>
-              <Icon name="brain" size={18} />
-              <div>
-                <strong>Regla de oro</strong>
-                <span>Si podés explicar el concepto con un ejemplo propio, ya lo aprendiste. Si no, volvé al laboratorio.</span>
               </div>
-            </div>
 
-            <MemoryAnchorCard worldOrTopic={lesson.worldId} />
-          </section>
-
-          <aside className="lesson-side">
-            <section className="panel lesson-3d-panel" style={{ borderColor: `${color}44` }}>
-              <Math3DScene
-                lesson={lesson}
-                activeStep={activeTheory}
-                activeFormula={lesson.formulas[activeTheory] ?? lesson.formulas[0]}
-                caption={lesson.theory[activeTheory]?.heading}
-              />
+              <MemoryAnchorCard worldOrTopic={lesson.worldId} />
             </section>
 
+            <aside className="lesson-side">
+              <section className="panel lesson-3d-panel" style={{ borderColor: `${color}44` }}>
+                <Math3DScene
+                  lesson={lesson}
+                  activeStep={activeTheory}
+                  activeFormula={lesson.formulas[activeTheory] ?? lesson.formulas[0]}
+                  caption={lesson.theory[activeTheory]?.heading}
+                />
+              </section>
+            </aside>
+          </div>
+
+          <div className="lesson-bottom-meta">
             <section className="panel formula-panel" style={{ borderColor: `${color}33` }}>
               <div className="formula-panel-head">
                 <Icon name="layers" size={16} />
@@ -281,7 +285,7 @@ export default function LessonView() {
               <strong>{lesson.source}</strong>
               <p>Contenido alineado al cursillo de ingreso 2027.</p>
             </section>
-          </aside>
+          </div>
         </div>
       ) : null}
 
