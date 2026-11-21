@@ -61,7 +61,7 @@ export default function StepsPracticeView() {
     setHelpStage(0);
     setScanning(false);
     const id = window.setTimeout(() => {
-      inputRef.current?.focus();
+      inputRef.current?.focus({ preventScroll: true });
     }, 40);
     return () => window.clearTimeout(id);
   }, [exercise.id, series]);

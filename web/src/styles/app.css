@@ -2727,3 +2727,12 @@ button:focus-visible, a:focus-visible { outline: 2px solid rgba(34, 211, 238, 0.
   flex-direction: column;
   gap: 10px;
 }
+
+/* Focus cleanliness & highlighted target world on MapView */
+main.app-content:focus {
+  outline: none;
+}
+.map-world.focused .map-world-head {
+  border-color: var(--world-color);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--world-color) 42%, transparent);
+}

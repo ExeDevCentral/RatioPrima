@@ -262,7 +262,7 @@ export default function ProgressView() {
         </section>
 
         <section className="panel history-panel">
-          <SectionTitle eyebrow="Simulacros" title="Últimos resultados" right={<button className="text-button" onClick={() => navigate('exam')}>Ir a la arena</button>} />
+          <SectionTitle eyebrow="Simulacros" title="Últimos resultados" right={<button className="text-button" onClick={() => navigate('exam')}>Ir a simulacros</button>} />
           {state.examResults.length === 0 ? (
             <div className="empty-state">
               <Icon name="seal" size={26} />

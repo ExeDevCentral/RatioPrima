@@ -62,6 +62,9 @@ export default function LessonView() {
   const bestScore = state.lessonBest[lesson.id];
 
   const [phase, setPhase] = useState<Phase>('teoria');
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [phase]);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [results, setResults] = useState<Record<string, boolean>>({});

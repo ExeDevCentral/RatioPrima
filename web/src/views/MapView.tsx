@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { WORLDS, ALL_LESSONS } from '../data/curriculum';
 import { LAB_META } from '../components/labs/LabRenderer';
 import { useLearning, lessonUnlocked } from '../state/LearningContext';
@@ -18,7 +18,17 @@ const LAB_ICON: Record<string, 'orbit' | 'scale' | 'compass' | 'chart' | 'cube' 
 };
 
 export default function MapView() {
-  const { state, openLesson, navigate, pushToast } = useLearning();
+  const { route, state, openLesson, navigate, pushToast } = useLearning();
+  const targetWorldId = route.lessonId;
+
+  useEffect(() => {
+    if (!targetWorldId) return;
+    const timer = window.setTimeout(() => {
+      const el = document.getElementById(`world-${targetWorldId}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 60);
+    return () => window.clearTimeout(timer);
+  }, [targetWorldId]);
 
   const completed = state.completedLessons.length;
   const overall = Math.round((completed / Math.max(1, ALL_LESSONS.length)) * 100);
@@ -98,7 +108,8 @@ export default function MapView() {
           return (
             <section
               key={world.id}
-              className={`map-world ${side} ${conquered ? 'conquered' : ''}`}
+              id={`world-${world.id}`}
+              className={`map-world ${side} ${conquered ? 'conquered' : ''} ${targetWorldId === world.id ? 'focused' : ''}`}
               style={{ '--world-color': world.color, '--world-accent': world.accent } as React.CSSProperties}
             >
               <div className="map-world-marker" style={{ color: world.color, background: world.accent }}>

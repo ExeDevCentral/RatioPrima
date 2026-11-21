@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { LearningProvider, useLearning, type ViewName } from './state/LearningContext';
 import Dashboard from './views/Dashboard';
 import MapView from './views/MapView';
@@ -243,9 +243,12 @@ function MobileNav() {
           </button>
         );
       })}
-      <button className="mobile-link" onClick={() => navigate('exam')}>
+      <button
+        className={`mobile-link ${route.view === 'exam' ? 'active' : ''}`}
+        onClick={() => navigate('exam')}
+      >
         <Icon name="trophy" size={20} />
-        <span>Arena</span>
+        <span>Simulacros</span>
       </button>
     </nav>
   );
@@ -349,9 +352,15 @@ function Shell() {
   const { ready, route } = useLearning();
   const [symbolsOpen, setSymbolsOpen] = useState(false);
   const [manualCollapse, setManualCollapse] = useState<boolean | null>(null);
+  const mainRef = useRef<HTMLElement | null>(null);
   const viewKey = useMemo(() => `${route.view}-${route.lessonId ?? ''}`, [route]);
   const autoCollapse = route.view === 'lesson' || route.view === 'cinema';
   const sidebarCollapsed = manualCollapse ?? autoCollapse;
+
+  useEffect(() => {
+    if (!ready) return;
+    mainRef.current?.focus({ preventScroll: true });
+  }, [ready, viewKey]);
 
   if (!ready) return <Splash />;
 
@@ -368,7 +377,7 @@ function Shell() {
       />
       <div className="app-main">
         <TopHUD onOpenSymbols={() => setSymbolsOpen(true)} />
-        <main className="app-content" key={viewKey}>
+        <main ref={mainRef} className="app-content" key={viewKey} tabIndex={-1}>
           <RoutedView />
         </main>
         <footer className="app-footer">

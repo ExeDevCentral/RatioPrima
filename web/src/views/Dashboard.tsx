@@ -180,7 +180,7 @@ export default function Dashboard() {
               key={worldItem.id}
               className="world-card"
               style={{ '--world-color': worldItem.color, '--world-accent': worldItem.accent } as React.CSSProperties}
-              onClick={() => navigate('map')}
+              onClick={() => navigate('map', worldItem.id)}
             >
               <div className="world-card-top">
                 <div className="world-icon" style={{ color: worldItem.color, background: worldItem.accent, borderColor: `${worldItem.color}44` }}>
