@@ -84,7 +84,7 @@ export const algebra: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 24-25'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 24-25'
     },
     {
       id: 'algebra-productos',
@@ -158,7 +158,7 @@ export const algebra: World = {
           difficulty: 2
         }
       ],
-      source: 'PDF p. 25-26'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 25-26'
     },
     {
       id: 'algebra-factor-comun',
@@ -231,7 +231,7 @@ export const algebra: World = {
           difficulty: 2
         }
       ],
-      source: 'PDF p. 27'
+      source: 'Ingreso Terciario 2027 · Matemática, p. 27'
     },
     {
       id: 'algebra-factoreo',
@@ -304,7 +304,7 @@ export const algebra: World = {
           difficulty: 3
         }
       ],
-      source: 'PDF p. 27-30'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 27-29'
     }
   ]
 };

@@ -71,6 +71,7 @@ export function parseNumericValue(norm: string): number | null {
   return null;
 }
 
+/** Revisor local por reglas; no llama a un modelo generativo ni a una API externa. */
 export function reviewAnswerWithAI(exercise: StepExercise, rawInput: string): AIReviewResult {
   const normalizedInput = normalizeMathInput(rawInput);
 

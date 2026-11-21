@@ -26,6 +26,7 @@ export type ViewName =
   | 'lesson'
   | 'practice'
   | 'steps'
+  | 'exercises'
   | 'cinema'
   | 'exam'
   | 'progress'
@@ -78,7 +79,7 @@ function parseHash(): Route {
   if (typeof window === 'undefined') return { view: 'dashboard' };
   const hash = window.location.hash.replace(/^#\/?/, '');
   const [view, lessonId] = hash.split('/');
-  const views: ViewName[] = ['dashboard', 'map', 'lesson', 'practice', 'steps', 'cinema', 'exam', 'progress', 'plan', 'lab'];
+  const views: ViewName[] = ['dashboard', 'map', 'lesson', 'practice', 'steps', 'exercises', 'cinema', 'exam', 'progress', 'plan', 'lab'];
   if (views.includes(view as ViewName)) {
     return { view: view as ViewName, lessonId };
   }

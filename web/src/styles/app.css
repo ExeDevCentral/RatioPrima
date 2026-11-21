@@ -1233,6 +1233,73 @@ button:focus-visible, a:focus-visible { outline: 2px solid rgba(34, 211, 238, 0.
   padding-bottom: 16px;
 }
 
+.lesson-classroom {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.lesson-classroom-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px;
+}
+.classroom-progress {
+  display: flex;
+  gap: 8px;
+}
+.classroom-progress-dot {
+  flex: 1;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.16);
+}
+.classroom-progress-dot.done { background: color-mix(in srgb, var(--lesson-color) 58%, transparent); }
+.classroom-progress-dot.active { background: var(--lesson-color); box-shadow: 0 0 16px color-mix(in srgb, var(--lesson-color) 48%, transparent); }
+.classroom-explanation {
+  padding: 20px;
+  border: 1px solid color-mix(in srgb, var(--lesson-color) 22%, var(--border));
+  border-radius: 16px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--lesson-color) 7%, rgba(5, 12, 22, 0.88)), rgba(5, 12, 22, 0.92));
+}
+.classroom-explanation-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--lesson-color);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.classroom-explanation h3 { margin: 12px 0 8px; font-size: clamp(18px, 2vw, 23px); letter-spacing: -.025em; }
+.classroom-explanation > p { color: var(--text-soft); font-size: 14px; line-height: 1.8; }
+.classroom-explanation .formula-card { margin-top: 16px; text-align: center; }
+.classroom-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--faint); font-size: 11px; }
+.classroom-controls .preset-row { justify-content: flex-end; }
+.classroom-stage { min-width: 0; order: 0; }
+.lesson-classroom-panel { order: 1; }
+.classroom-scene { padding: 18px; }
+.classroom-scene .math3d-card { gap: 14px; }
+.classroom-scene .math3d-head h4 { font-size: 18px; }
+.classroom-scene .math3d-head p { font-size: 13px; }
+.classroom-scene .math3d-canvas { height: clamp(460px, 62vh, 660px); }
+.classroom-scene .math3d-canvas-wrap { border-radius: 18px; }
+.classroom-scene .math3d-legend { font-size: 12px; }
+@media (max-width: 1080px) {
+  .classroom-scene .math3d-canvas { height: min(60vh, 520px); }
+}
+@media (max-width: 600px) {
+  .lesson-classroom-panel { padding: 18px; }
+  .classroom-explanation { padding: 16px; }
+  .classroom-controls { align-items: flex-start; flex-direction: column; }
+  .classroom-controls .preset-row { width: 100%; justify-content: space-between; }
+  .classroom-scene { padding: 12px; }
+  .classroom-scene .math3d-canvas { height: 390px; }
+}
+
 .math3d-card {
   display: flex;
   flex-direction: column;
@@ -1275,6 +1342,12 @@ button:focus-visible, a:focus-visible { outline: 2px solid rgba(34, 211, 238, 0.
 .math3d-card.compact .math3d-canvas {
   height: 340px;
 }
+.math3d-card.rt-mode .math3d-canvas {
+  height: 500px;
+}
+.math3d-card.rt-mode.compact .math3d-canvas {
+  height: 430px;
+}
 .math3d-canvas:active {
   cursor: grabbing;
 }
@@ -1285,6 +1358,120 @@ button:focus-visible, a:focus-visible { outline: 2px solid rgba(34, 211, 238, 0.
   background: rgba(8, 16, 31, 0.85);
   text-align: center;
   overflow-x: auto;
+}
+
+/* ── Lectura trigonométrica en vivo (Triángulo Rectángulo 3D) ─────────── */
+.rt-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(253, 224, 71, 0.28);
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(253, 224, 71, 0.08), transparent 55%),
+    rgba(8, 16, 31, 0.88);
+}
+.rt-readout.compact {
+  padding: 10px 11px;
+  gap: 8px;
+}
+.rt-readout-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.rt-angle {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 11px;
+  color: #cbd5e1;
+  letter-spacing: -0.01em;
+}
+.rt-formula {
+  text-align: center;
+  overflow-x: auto;
+  font-size: 13px;
+  color: #e2e8f0;
+  padding: 2px 0;
+  transition: text-shadow 0.2s ease;
+}
+.rt-readout.compact .rt-formula {
+  font-size: 12px;
+}
+.rt-exact {
+  font-size: 11.5px;
+  color: #fde047;
+  text-align: center;
+  line-height: 1.5;
+}
+.rt-exact .katex {
+  font-size: 1em;
+}
+.rt-formula.is-active {
+  text-shadow: 0 0 16px rgba(253, 224, 71, 0.32);
+}
+.rt-identity {
+  opacity: 0.86;
+}
+.rt-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.rt-bar-row {
+  display: grid;
+  grid-template-columns: 52px 1fr 58px;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #94a3b8;
+  opacity: 0.82;
+  transition: opacity 0.2s ease;
+}
+.rt-bar-row.is-active {
+  opacity: 1;
+}
+.rt-bar-row strong {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 11px;
+  color: #e2e8f0;
+  text-align: right;
+}
+.rt-bar-track {
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.14);
+  overflow: hidden;
+}
+.rt-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  box-shadow: 0 0 10px currentColor;
+  transition: width 0.16s linear;
+}
+.rt-check {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 11px;
+  color: #94a3b8;
+}
+.rt-presets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: #94a3b8;
+}
+.rt-readout .katex {
+  font-size: 1em;
+}
+@media (max-width: 600px) {
+  .rt-bar-row {
+    grid-template-columns: 48px 1fr 54px;
+  }
 }
 .math3d-sliders {
   display: grid;
@@ -1340,6 +1527,8 @@ button:focus-visible, a:focus-visible { outline: 2px solid rgba(34, 211, 238, 0.
   transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
 }
 .series-tab:hover { transform: translateY(-1px); border-color: rgba(34, 211, 238, 0.45); }
+.series-tab.locked { opacity: 0.68; border-style: dashed; }
+.series-unlock-hint { color: var(--yellow); font-size: 11px; font-style: normal; }
 .series-tab.active {
   border-color: #22d3ee;
   background: rgba(34, 211, 238, 0.12);
@@ -1349,6 +1538,10 @@ button:focus-visible, a:focus-visible { outline: 2px solid rgba(34, 211, 238, 0.
 .series-tab small { display: block; font-size: 11.5px; color: var(--muted, #94a3b8); }
 
 .steps-progress-panel { display: flex; flex-direction: column; gap: 10px; }
+.exercise-audit-inline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 14px; border: 1px solid rgba(34, 211, 238, 0.22); border-radius: 12px; background: rgba(34, 211, 238, 0.045); color: var(--muted); font-size: 11px; }
+.exercise-audit-inline strong { color: var(--text); font-size: 12px; }
+.exercise-audit-inline .btn { margin-left: auto; }
+@media (max-width: 600px) { .exercise-audit-inline { align-items: flex-start; flex-direction: column; } .exercise-audit-inline .btn { margin-left: 0; width: 100%; } }
 .steps-progress-head {
   display: flex;
   align-items: center;

@@ -24,8 +24,8 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { view: 'dashboard', label: 'Panel', icon: 'home', hint: 'Tu misión de hoy' },
   { view: 'map', label: 'Mapa', icon: 'map', hint: 'Los 8 mundos' },
-  { view: 'steps', label: 'Pasos 10+10', icon: 'route', hint: 'Teclado + IA en vivo' },
-  { view: 'cinema', label: 'Cine 3D + IA', icon: 'laser', hint: '3D gigante + Tutor IA' },
+  { view: 'exercises', label: 'Ejercicios', icon: 'route', hint: 'Ruta progresiva + auditoría matemática' },
+  { view: 'cinema', label: 'Cine 3D + Tutor', icon: 'laser', hint: 'Acompañamiento interactivo 3D' },
   { view: 'practice', label: 'Práctica', icon: 'target', hint: '10 preguntas rápidas' },
   { view: 'exam', label: 'Simulacros', icon: 'trophy', hint: 'La Arena' },
   { view: 'progress', label: 'Progreso', icon: 'chart', hint: 'Tus números' },
@@ -34,7 +34,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const MOBILE_ITEMS: NavItem[] = NAV_ITEMS.filter((item) =>
-  ['dashboard', 'map', 'steps', 'practice', 'lab'].includes(item.view)
+  ['dashboard', 'map', 'exercises', 'practice', 'lab'].includes(item.view)
 );
 
 function Brand({ compact = false }: { compact?: boolean }) {
@@ -269,6 +269,7 @@ function RoutedView() {
     case 'practice':
       return <PracticeView />;
     case 'steps':
+    case 'exercises':
       return <StepsPracticeView />;
     case 'cinema':
       return <Cinema3DTutorView />;

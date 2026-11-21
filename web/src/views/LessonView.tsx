@@ -308,12 +308,12 @@ export default function LessonView() {
       ) : null}
 
       {phase === 'pasos' ? (
-        <div className="lesson-steps-grid">
-          <section className="panel lesson-steps">
+        <div className="lesson-steps-grid lesson-classroom">
+          <section className="panel lesson-steps lesson-classroom-panel">
             <SectionTitle
-              eyebrow="Etapa 3 · Método"
-              title="Pasos guiados"
-              description="Recorré cada paso para ver cómo se transforma el modelo 3D mientras se explica el ejemplo."
+              eyebrow={`Clase guiada · Paso ${activeStep + 1} de ${lesson.steps.length}`}
+              title={lesson.steps[activeStep]?.title ?? 'Pasos guiados'}
+              description="Mirá un paso, leé la explicación y avanzá cuando la idea esté clara."
               right={
                 <div className="preset-row">
                   <button
@@ -335,38 +335,62 @@ export default function LessonView() {
                 </div>
               }
             />
-            <div className="guided-steps">
+            <div className="classroom-progress" aria-label={`Paso ${activeStep + 1} de ${lesson.steps.length}`}>
               {lesson.steps.map((step, stepIndex) => (
-                <article
+                <button
                   key={step.title}
-                  className={`guided-step interactive ${activeStep === stepIndex ? 'active' : ''}`}
+                  type="button"
+                  className={`classroom-progress-dot ${stepIndex === activeStep ? 'active' : ''} ${stepIndex < activeStep ? 'done' : ''}`}
                   onClick={() => setActiveStep(stepIndex)}
-                >
-                  <div className="guided-number" style={{ color, borderColor: `${color}55`, background: `${color}14` }}>
-                    {stepIndex + 1}
-                  </div>
-                  <div className="guided-content">
-                    <h3>{step.title}</h3>
-                    <p><RichText text={step.detail} /></p>
-                    {step.latex ? <FormulaCard formula={step.latex} label="expresión" /> : null}
-                  </div>
-                  {stepIndex < lesson.steps.length - 1 ? <div className="guided-connector" style={{ background: `linear-gradient(180deg, ${color}88, transparent)` }} /> : null}
-                </article>
+                  aria-label={`Ir al paso ${stepIndex + 1}: ${step.title}`}
+                  aria-current={stepIndex === activeStep ? 'step' : undefined}
+                />
               ))}
             </div>
-            <div className="lab-footnote">
-              <Icon name="bulb" size={15} />
-              <span>Practicá el método en el laboratorio antes de pasar al checkpoint. La memoria muscular también cuenta.</span>
+            <article className="classroom-explanation" aria-live="polite">
+              <div className="classroom-explanation-label"><Icon name="book" size={15} /> Explicación</div>
+              <h3>{lesson.steps[activeStep]?.title}</h3>
+              <p><RichText text={lesson.steps[activeStep]?.detail ?? ''} /></p>
+              {lesson.steps[activeStep]?.latex ? (
+                <FormulaCard formula={lesson.steps[activeStep].latex!} label="En la pizarra" />
+              ) : null}
+            </article>
+            <div className="classroom-controls">
+              <span>{activeStep + 1} / {lesson.steps.length}</span>
+              <div className="preset-row">
+                <button
+                  type="button"
+                  className="chip"
+                  disabled={activeStep === 0}
+                  onClick={() => setActiveStep((s) => Math.max(0, s - 1))}
+                >
+                  ← Anterior
+                </button>
+                {activeStep < lesson.steps.length - 1 ? (
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => setActiveStep((s) => Math.min(lesson.steps.length - 1, s + 1))}
+                  >
+                    Siguiente paso <Icon name="arrow" size={15} />
+                  </button>
+                ) : (
+                  <button type="button" className="chip active" onClick={() => setPhase('checkpoint')}>
+                    Ir a la práctica <Icon name="target" size={14} />
+                  </button>
+                )}
+              </div>
             </div>
           </section>
 
-          <aside className="lesson-side">
-            <section className="panel lesson-3d-panel sticky" style={{ borderColor: `${color}44` }}>
+          <aside className="lesson-side classroom-stage">
+            <section className="panel lesson-3d-panel sticky classroom-scene" style={{ borderColor: `${color}44` }}>
               <Math3DScene
                 lesson={lesson}
                 activeStep={activeStep}
                 activeFormula={lesson.steps[activeStep]?.latex ?? lesson.formulas[0]}
-                caption={`Paso ${activeStep + 1}: ${lesson.steps[activeStep]?.title ?? ''}`}
+                caption={`Pizarra 3D · ${lesson.steps[activeStep]?.title ?? ''}`}
+                guided
               />
             </section>
           </aside>

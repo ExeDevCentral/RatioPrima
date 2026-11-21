@@ -96,7 +96,7 @@ export const reales: World = {
           difficulty: 3
         }
       ],
-      source: 'PDF p. 13-15'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 3-5'
     },
     {
       id: 'reales-recta',
@@ -170,7 +170,7 @@ export const reales: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 15-17'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 6-7'
     },
     {
       id: 'reales-absoluto',
@@ -243,7 +243,7 @@ export const reales: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 16'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 6-9'
     },
     {
       id: 'reales-intervalos',
@@ -316,7 +316,7 @@ export const reales: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 17-18'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 7-9'
     }
   ]
 };

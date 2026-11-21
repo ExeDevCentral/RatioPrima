@@ -135,6 +135,11 @@ export function evaluateMathExpression(expr: string): number | null {
 }
 
 const SCENE_TUTOR_HINTS: Record<Scene3DKind, { topic: string; cue: string; question: string }> = {
+  righttriangle3d: {
+    topic: 'Triángulo Rectángulo y Razones',
+    cue: 'Arrastrá el punto dorado: H es el radio del círculo, CO es el cateto rosa (frente a α) y CA el cian (tocando α).',
+    question: 'Si acercás α a 90°, ¿qué le pasa a tan α y por qué el cateto adyacente se achica?'
+  },
   helix3d: {
     topic: 'Trigonometría en 3D',
     cue: 'Mirá el triángulo dentro del círculo unitario en el plano XY y cómo se estira formando la hélice en Z.',

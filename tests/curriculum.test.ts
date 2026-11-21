@@ -67,6 +67,17 @@ test('Currículo: 8 mundos, 4 misiones por mundo y 108 preguntas', () => {
   });
 });
 
+test('Currículo alineado: ordena los prerrequisitos del temario de ingreso', () => {
+  const firstOf = (worldId: string) => CONTENT_LESSONS.findIndex((lesson) => lesson.worldId === worldId);
+  assert.ok(firstOf('reales') < firstOf('operaciones'));
+  assert.ok(firstOf('operaciones') < firstOf('trigonometria'));
+  assert.ok(firstOf('trigonometria') < firstOf('algebra'));
+  assert.ok(firstOf('algebra') < firstOf('ecuaciones'));
+  assert.ok(firstOf('ecuaciones') < firstOf('inecuaciones'));
+  assert.ok(firstOf('inecuaciones') < firstOf('sistemas'));
+  assert.ok(CONTENT_LESSONS.every((lesson) => lesson.source.includes('Ingreso Terciario 2027')));
+});
+
 test('Lecciones: contenido, laboratorio y fuente completos', () => {
   ALL_LESSONS.forEach((lesson) => {
     const world = WORLDS.find((item) => item.id === lesson.worldId);

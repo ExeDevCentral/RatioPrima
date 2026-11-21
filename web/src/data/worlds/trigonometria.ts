@@ -43,6 +43,7 @@ export const trigonometria: World = {
       ],
       lab: 'unitcircle',
       labConfig: { angle: 60, mode: 'degrees' },
+      scene3d: 'righttriangle3d',
       steps: [
         {
           title: 'Clasificá por el barrido',
@@ -84,7 +85,7 @@ export const trigonometria: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 17-20'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 17-20'
     },
     {
       id: 'trigono-radianes',
@@ -116,6 +117,7 @@ export const trigonometria: World = {
       ],
       lab: 'unitcircle',
       labConfig: { angle: 45, mode: 'radians' },
+      scene3d: 'righttriangle3d',
       steps: [
         {
           title: 'Partí de 180° = π',
@@ -157,7 +159,7 @@ export const trigonometria: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 20-21'
+      source: 'Ingreso Terciario 2027 · Matemática, p. 20'
     },
     {
       id: 'trigono-razones',
@@ -189,6 +191,7 @@ export const trigonometria: World = {
       ],
       lab: 'unitcircle',
       labConfig: { angle: 30, mode: 'triangle' },
+      scene3d: 'righttriangle3d',
       steps: [
         {
           title: 'Marcá el ángulo de referencia',
@@ -230,7 +233,7 @@ export const trigonometria: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 21-23'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 21-23'
     },
     {
       id: 'trigono-identidad',
@@ -262,6 +265,7 @@ export const trigonometria: World = {
       ],
       lab: 'unitcircle',
       labConfig: { angle: 35, mode: 'identity' },
+      scene3d: 'righttriangle3d',
       steps: [
         {
           title: 'Elegí la identidad que conecta los datos',
@@ -303,7 +307,7 @@ export const trigonometria: World = {
           difficulty: 3
         }
       ],
-      source: 'PDF p. 21-23'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 21-23'
     }
   ]
 };

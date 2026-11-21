@@ -84,7 +84,7 @@ export const inecuaciones: World = {
           difficulty: 2
         }
       ],
-      source: 'PDF p. 35'
+      source: 'Ingreso Terciario 2027 · Matemática, p. 35'
     },
     {
       id: 'inecuaciones-lineales',
@@ -158,7 +158,7 @@ export const inecuaciones: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 35-37'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 35-37'
     },
     {
       id: 'inecuaciones-compuestas',
@@ -230,7 +230,7 @@ export const inecuaciones: World = {
           difficulty: 3
         }
       ],
-      source: 'PDF p. 36-37'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 36-37'
     },
     {
       id: 'inecuaciones-signo',
@@ -306,7 +306,7 @@ export const inecuaciones: World = {
           difficulty: 2
         }
       ],
-      source: 'PDF p. 36-37'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 35-37'
     }
   ]
 };

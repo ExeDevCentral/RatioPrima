@@ -9,6 +9,7 @@ import {
   type StepSeriesId
 } from '../data/stepExercises';
 import { useLearning } from '../state/LearningContext';
+import { auditLearningProfile, canAdvanceFromSeries, nextExerciseSeries, seriesProgress, seriesUnlocked } from '../lib/exerciseAudit';
 import Icon from '../components/ui/Icon';
 import { Bar, Pill, SectionTitle } from '../components/ui/Primitives';
 import RichText, { FormulaCard } from '../components/ui/RichText';
@@ -19,11 +20,11 @@ import { playClick, playLaser } from '../lib/sfx';
 const KEYPAD_KEYS = ['7', '8', '9', '/', '4', '5', '6', '-', '1', '2', '3', '.', '0'];
 
 export default function StepsPracticeView() {
-  const { recordQuestion, pushToast } = useLearning();
+  const { recordQuestion, pushToast, state } = useLearning();
   const [series, setSeries] = useState<StepSeriesId>('zero');
   const [index, setIndex] = useState(0);
   const [inputs, setInputs] = useState<Record<string, string>>({});
-  const [reviews, setReviews] = useState<Record<string, AIReviewResult>>({});
+  const [verdicts, setVerdicts] = useState<Record<string, AIReviewResult>>({});
   const [scanning, setScanning] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -41,16 +42,20 @@ export default function StepsPracticeView() {
 
   const exercise = list[index] ?? list[0];
   const currentInput = inputs[exercise.id] ?? '';
-  const currentReview = reviews[exercise.id];
+  const storedStat = state.questionStats[exercise.id];
+  const currentReview = verdicts[exercise.id];
 
-  const solvedCount = useMemo(
-    () => list.filter((ex) => reviews[ex.id]?.isCorrect).length,
-    [list, reviews]
-  );
+  const savedSeriesProgress = useMemo(() => seriesProgress(series, state.questionStats), [series, state.questionStats]);
+  const solvedCount = savedSeriesProgress.solved;
   const attemptedCount = useMemo(
-    () => list.filter((ex) => Boolean(reviews[ex.id])).length,
-    [list, reviews]
+    () => list.filter((ex) => (state.questionStats[ex.id]?.attempts ?? 0) > 0).length,
+    [list, state.questionStats]
   );
+  const audit = useMemo(() => auditLearningProfile(state.questionStats), [state.questionStats]);
+  const nextSeries = nextExerciseSeries(series);
+  const canAdvance = canAdvanceFromSeries(series, state.questionStats);
+  const isSeriesComplete = attemptedCount === list.length;
+  const seriesLabel = (id: StepSeriesId) => id === 'zero' ? 'Nivel 0' : id === 'simple' ? 'Nivel 1' : 'Nivel 2';
 
   useEffect(() => {
     setShowHint(false);
@@ -69,6 +74,14 @@ export default function StepsPracticeView() {
 
   const switchSeries = (nextSeries: StepSeriesId) => {
     if (nextSeries === series) return;
+    if (!seriesUnlocked(series, state.questionStats) || !seriesUnlocked(nextSeries, state.questionStats)) {
+      pushToast({
+        title: 'Completá primero esta etapa',
+        detail: 'Para pasar de nivel necesitás resolver al menos 8 de los 10 ejercicios.',
+        tone: 'warning'
+      });
+      return;
+    }
     playClick();
     setSeries(nextSeries);
     setIndex(0);
@@ -76,6 +89,12 @@ export default function StepsPracticeView() {
 
   const setAnswerText = (val: string) => {
     setInputs((prev) => ({ ...prev, [exercise.id]: val }));
+    setVerdicts((prev) => {
+      if (!prev[exercise.id]) return prev;
+      const next = { ...prev };
+      delete next[exercise.id];
+      return next;
+    });
   };
 
   const appendKey = (key: string) => {
@@ -92,8 +111,14 @@ export default function StepsPracticeView() {
 
   const goNext = () => {
     if (index < list.length - 1) {
+      if (!currentReview) {
+        pushToast({ title: 'Auditoría pendiente', detail: 'Revisá tu respuesta antes de pasar al próximo ejercicio.', tone: 'warning' });
+        return;
+      }
       playClick();
       setIndex((i) => i + 1);
+    } else if (index === list.length - 1 && !seriesProgress(series, state.questionStats).unlocked) {
+      pushToast({ title: 'Primero completá esta etapa', detail: 'Auditar los 10 ejercicios habilita el siguiente nivel.', tone: 'warning' });
     }
   };
 
@@ -104,7 +129,7 @@ export default function StepsPracticeView() {
     }
   };
 
-  const runAIReview = () => {
+  const runAnswerAudit = () => {
     if (scanning) return;
     if (!currentInput.trim()) {
       pushToast({
@@ -122,12 +147,11 @@ export default function StepsPracticeView() {
 
     scanTimerRef.current = window.setTimeout(() => {
       const result = reviewAnswerWithAI(exercise, currentInput);
-      const alreadySolved = reviews[exercise.id]?.isCorrect;
-
-      setReviews((prev) => ({ ...prev, [exercise.id]: result }));
+      const previousCorrect = state.questionStats[exercise.id]?.correct ?? 0;
+      const isNewAuditedAnswer = verdicts[exercise.id]?.normalizedInput !== result.normalizedInput;
+      setVerdicts((prev) => ({ ...prev, [exercise.id]: result }));
       setScanning(false);
-
-      if (!alreadySolved) {
+      if (isNewAuditedAnswer) {
         recordQuestion(
           {
             id: exercise.id,
@@ -138,19 +162,19 @@ export default function StepsPracticeView() {
             difficulty: series === 'simple' ? 1 : 2
           },
           result.isCorrect,
-          result.isCorrect ? exercise.xp : 0
+          result.isCorrect && previousCorrect === 0 ? exercise.xp : 0
         );
       }
 
-      if (result.isCorrect) {
+      if (result.isCorrect && previousCorrect === 0) {
         const nextSolved = list.filter(
-          (ex) => ex.id === exercise.id || reviews[ex.id]?.isCorrect
+          (ex) => ex.id === exercise.id || (state.questionStats[ex.id]?.correct ?? 0) > 0
         ).length;
         if (nextSolved === list.length) {
           burstConfetti();
           pushToast({
-            title: `¡Serie ${series === 'simple' ? 'Pasos Simples' : 'Desafío'} completada!`,
-            detail: '10/10 ejercicios validados con revisión IA.',
+            title: `Etapa ${seriesLabel(series)} completada`,
+            detail: 'Resolviste todos los ejercicios. Revisá tu auditoría y avanzá cuando estés listo.',
             tone: 'success'
           });
         }
@@ -164,19 +188,19 @@ export default function StepsPracticeView() {
       if (currentReview?.isCorrect && index < list.length - 1) {
         goNext();
       } else {
-        runAIReview();
+        runAnswerAudit();
       }
     }
   };
 
   const resetSeries = () => {
     playLaser();
-    setReviews((prev) => {
+    setInputs((prev) => {
       const next = { ...prev };
       for (const ex of list) delete next[ex.id];
       return next;
     });
-    setInputs((prev) => {
+    setVerdicts((prev) => {
       const next = { ...prev };
       for (const ex of list) delete next[ex.id];
       return next;
@@ -188,14 +212,13 @@ export default function StepsPracticeView() {
     <div className="view steps-view">
       <section className="panel steps-hero">
         <div className="steps-hero-copy">
-          <div className="eyebrow">Teclado + Revisión IA en vivo</div>
+          <div className="eyebrow">Ruta progresiva · Auditoría matemática local</div>
           <h1>
-            Pasos Simples <span className="gradient-text">10 + 10</span>
+            Aprendé haciendo <span className="gradient-text">paso a paso</span>
           </h1>
           <p>
-            Escribí tus respuestas directamente con el teclado (números, signos y fracciones como{' '}
-            <code>3/5</code> o <code>-9/8</code>). La IA analiza tu entrada en cada ejercicio y
-            despliega los pasos animados.
+            Empezá desde las bases, resolvé problemas del ingreso y avanzá hacia desafíos. El corrector local
+            compara respuestas y errores conocidos: no usa un modelo generativo ni envía datos a un servicio externo.
           </p>
         </div>
 
@@ -213,24 +236,26 @@ export default function StepsPracticeView() {
           </button>
           <button
             type="button"
-            className={`series-tab ${series === 'simple' ? 'active' : ''}`}
+            className={`series-tab ${series === 'simple' ? 'active' : ''} ${!seriesUnlocked('zero', state.questionStats) ? 'locked' : ''}`}
             onClick={() => switchSeries('simple')}
+            aria-disabled={!seriesUnlocked('zero', state.questionStats)}
           >
             <Icon name="bolt" size={16} />
             <div>
               <strong>Nivel 1 · Básico</strong>
-              <small>10 ejercicios del cursillo</small>
+              <small>{seriesProgress('simple', state.questionStats).solved}/10 resueltos · 8 desbloquean</small>
             </div>
           </button>
           <button
             type="button"
-            className={`series-tab ${series === 'challenge' ? 'active' : ''}`}
+            className={`series-tab ${series === 'challenge' ? 'active' : ''} ${!seriesUnlocked('simple', state.questionStats) ? 'locked' : ''}`}
             onClick={() => switchSeries('challenge')}
+            aria-disabled={!seriesUnlocked('simple', state.questionStats)}
           >
             <Icon name="brain" size={16} />
             <div>
               <strong>Nivel 2 · Desafío</strong>
-              <small>10 ejercicios de examen</small>
+              <small>{seriesProgress('challenge', state.questionStats).solved}/10 resueltos · 8 desbloquean</small>
             </div>
           </button>
         </div>
@@ -240,7 +265,8 @@ export default function StepsPracticeView() {
         <div className="steps-progress-head">
           <span>
             Ejercicio <strong>{index + 1}</strong> de {list.length} ·{' '}
-            <em style={{ color: '#34d399' }}>{solvedCount}/10 validados</em>
+            <em style={{ color: '#34d399' }}>{solvedCount}/10 resueltos</em>
+            {nextSeries ? <small className="series-unlock-hint"> · {canAdvance ? 'Siguiente nivel disponible' : `Resolvé ${Math.max(0, 8 - solvedCount)} más para avanzar`}</small> : null}
           </span>
           <div className="preset-row">
             <Pill icon="bolt" color="#fde047">+{exercise.xp} XP</Pill>
@@ -252,14 +278,21 @@ export default function StepsPracticeView() {
         <Bar value={(solvedCount / list.length) * 100} color="#34d399" height={6} />
         <div className="steps-dots" role="tablist" aria-label="Selector de ejercicios">
           {list.map((ex, i) => {
-            const rev = reviews[ex.id];
-            const cls = rev ? (rev.isCorrect ? 'ok' : 'err') : '';
+            const stat = state.questionStats[ex.id];
+            const cls = stat?.correct ? 'ok' : stat?.attempts ? 'err' : '';
             return (
               <button
                 key={ex.id}
                 type="button"
+                disabled={i > index && !currentReview}
                 className={`step-dot ${i === index ? 'current' : ''} ${cls}`}
-                onClick={() => setIndex(i)}
+                onClick={() => {
+                  if (i > index && (state.questionStats[exercise.id]?.attempts ?? 0) === 0) {
+                    pushToast({ title: 'Resolvé este ejercicio antes de seguir', detail: 'La ruta se recorre en orden para construir las bases paso a paso.', tone: 'warning' });
+                    return;
+                  }
+                  setIndex(i);
+                }}
                 title={`Ejercicio ${i + 1}: ${ex.topic}`}
               >
                 {i + 1}
@@ -267,6 +300,15 @@ export default function StepsPracticeView() {
             );
           })}
         </div>
+        {isSeriesComplete ? (
+          <div className="exercise-audit-inline">
+            <strong>Auditoría de la ruta</strong>
+            <span>Fortalezas: {audit.strengths.length ? audit.strengths.join(', ') : 'aún sin datos suficientes'}.</span>
+            <span>Para reforzar: {audit.weaknesses.length ? audit.weaknesses.join(', ') : 'sin debilidades concluyentes'}.</span>
+            <span>En el historial: {audit.correct} aciertos · {audit.incorrect} errores · {audit.coveredTopics} temas con intentos</span>
+            {nextSeries ? <button type="button" className="btn btn-primary btn-sm" disabled={!canAdvance} onClick={() => switchSeries(nextSeries)}>{canAdvance ? `Avanzar a ${seriesLabel(nextSeries)}` : 'Resolvé 8 de 10 para avanzar'} <Icon name="arrow" size={14} /></button> : null}
+          </div>
+        ) : null}
       </section>
 
       <div className="steps-workspace">
@@ -282,7 +324,7 @@ export default function StepsPracticeView() {
               </Pill>
               <Pill color="#22d3ee">{exercise.topic}</Pill>
             </div>
-            <span className="steps-kbd-hint">Tip: presioná <kbd>Enter</kbd> para revisar o avanzar</span>
+            <span className="steps-kbd-hint">Corrector local · presioná <kbd>Enter</kbd> para revisar o avanzar</span>
           </div>
 
           <h2 className="steps-prompt">
@@ -315,11 +357,11 @@ export default function StepsPracticeView() {
             <button
               type="button"
               className="btn btn-primary"
-              onClick={runAIReview}
+              onClick={runAnswerAudit}
               disabled={scanning}
             >
               <Icon name="spark" size={16} />
-              {scanning ? 'IA analizando...' : 'Revisar con IA'}
+              {scanning ? 'Revisando...' : 'Auditar respuesta'}
             </button>
             {scanning ? <div className="ai-scan-beam" aria-hidden="true" /> : null}
           </div>
@@ -372,15 +414,15 @@ export default function StepsPracticeView() {
 
         <section className="panel ai-review-panel">
           <SectionTitle
-            eyebrow="Tutor IA en vivo"
-            title="Revisión y pasos simples"
-            description="La IA evalúa tu número o fracción y te muestra exactamente el camino."
+            eyebrow="Corrector matemático local"
+            title="Auditoría y pasos simples"
+            description="Compara respuestas equivalentes y detecta errores frecuentes con reglas verificables."
           />
 
           {scanning ? (
             <div className="ai-loading-box">
               <div className="ai-pulse-orb" />
-              <p>Analizando tu respuesta paso a paso...</p>
+              <p>Comparando la respuesta con el resultado y los errores frecuentes...</p>
             </div>
           ) : currentReview ? (
             <div key={`${exercise.id}-${currentReview.normalizedInput}`} className={`ai-verdict-card ${currentReview.tone}`}>
@@ -415,10 +457,10 @@ export default function StepsPracticeView() {
           ) : (
             <div className="ai-idle-box">
               <Icon name="brain" size={28} />
-              <strong>Listo para revisar</strong>
+              <strong>Auditoría lista</strong>
               <p>
-                Escribí tu resultado con el teclado y presioná <kbd>Enter</kbd>. Si cometés un error
-                típico (como olvidar un signo o el doble producto), la IA te avisa dónde estuvo.
+                Escribí tu resultado y presioná <kbd>Enter</kbd>. El corrector local compara la respuesta,
+                admite equivalencias y detecta patrones de error definidos para el ejercicio.
               </p>
             </div>
           )}

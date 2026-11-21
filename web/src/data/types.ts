@@ -59,6 +59,11 @@ export interface Lesson {
   formulas: string[];
   lab: LabKind;
   labConfig?: Record<string, number | string | boolean>;
+  /**
+   * Escena 3D específica de la lección. Si se omite, se infiere del mundo.
+   * Permite que cada lección muestre el modelo que realmente explica.
+   */
+  scene3d?: string;
   steps: GuidedStep[];
   questions: Question[];
   source: string;

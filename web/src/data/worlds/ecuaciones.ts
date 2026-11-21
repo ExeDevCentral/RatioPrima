@@ -89,7 +89,7 @@ export const ecuaciones: World = {
           difficulty: 2
         }
       ],
-      source: 'PDF p. 30-31'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 30-32'
     },
     {
       id: 'ecuaciones-clasificacion',
@@ -162,7 +162,7 @@ export const ecuaciones: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 31-32'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 31-32'
     },
     {
       id: 'ecuaciones-cuadraticas',
@@ -236,7 +236,7 @@ export const ecuaciones: World = {
           difficulty: 2
         }
       ],
-      source: 'PDF p. 32-34'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 32-34'
     },
     {
       id: 'ecuaciones-fraccionarias',
@@ -309,7 +309,7 @@ export const ecuaciones: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 34'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 33-34'
     }
   ]
 };

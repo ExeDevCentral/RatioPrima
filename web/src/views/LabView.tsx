@@ -86,7 +86,7 @@ export default function LabView() {
           <SectionTitle
             eyebrow="Creaciones Matemáticas 3D"
             title="Explorador de modelos 3D del cursillo"
-            description="Cambiá entre las 8 creaciones 3D interactivas: cubo binomial (a+b)³, hélice trigonométrica, paraboloide de raíces, superficie racional y más."
+            description="Cambiá entre las 9 creaciones 3D interactivas: triángulo rectángulo con razones en vivo, cubo binomial (a+b)³, hélice trigonométrica, paraboloide de raíces, superficie racional y más."
           />
           <Math3DScene lesson={lesson} allowSwitch />
         </section>

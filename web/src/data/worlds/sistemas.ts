@@ -89,7 +89,7 @@ export const sistemas: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 38-39'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 38-39'
     },
     {
       id: 'sistemas-eliminacion',
@@ -173,7 +173,7 @@ export const sistemas: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 39-41'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 39-41'
     },
     {
       id: 'sistemas-igualacion',
@@ -256,7 +256,7 @@ export const sistemas: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 40-41'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 40-41'
     },
     {
       id: 'sistemas-problemas',
@@ -327,7 +327,7 @@ export const sistemas: World = {
           difficulty: 3
         }
       ],
-      source: 'PDF p. 41-42'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 41-42'
     }
   ]
 };

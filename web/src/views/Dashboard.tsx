@@ -131,8 +131,8 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
-          <button className="btn btn-block" onClick={() => navigate('practice')}>
-            <Icon name="target" size={15} /> Abrir práctica rápida
+          <button className="btn btn-block" onClick={() => navigate('exercises')}>
+            <Icon name="route" size={15} /> Seguir la ruta progresiva de ejercicios
           </button>
         </section>
 

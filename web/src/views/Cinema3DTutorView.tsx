@@ -20,7 +20,7 @@ export default function Cinema3DTutorView() {
     []
   );
 
-  const [activeScene, setActiveScene] = useState<Scene3DKind>('helix3d');
+  const [activeScene, setActiveScene] = useState<Scene3DKind>('righttriangle3d');
   const [sideTab, setSideTab] = useState<'chat' | 'guide'>('chat');
   const [input, setInput] = useState('');
   const [calcInput, setCalcInput] = useState('3/4 + 1/2');

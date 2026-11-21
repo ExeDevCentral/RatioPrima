@@ -86,7 +86,7 @@ export const operaciones: World = {
           difficulty: 2
         }
       ],
-      source: 'PDF p. 19-20'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 9-10'
     },
     {
       id: 'operaciones-potencias',
@@ -161,7 +161,7 @@ export const operaciones: World = {
           difficulty: 2
         }
       ],
-      source: 'PDF p. 21-22'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 11-12'
     },
     {
       id: 'operaciones-radicales',
@@ -236,7 +236,7 @@ export const operaciones: World = {
           difficulty: 1
         }
       ],
-      source: 'PDF p. 22-26'
+      source: 'Ingreso Terciario 2027 · Matemática, pp. 13-16'
     },
     {
       id: 'operaciones-exponente-racional',
@@ -311,7 +311,7 @@ export const operaciones: World = {
           difficulty: 3
         }
       ],
-      source: 'PDF p. 26-27'
+      source: 'Ingreso Terciario 2027 · Matemática, p. 16'
     }
   ]
 };
