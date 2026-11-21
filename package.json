@@ -1,7 +1,7 @@
 {
-  "name": "polymath-zero",
+  "name": "ratio-prima",
   "version": "1.0.0",
-  "description": "Polymath Zero - Plataforma Interactiva de Fundamentos Matemáticos y Demostraciones Formales para Pre-Ingreso Politécnico & Ingeniería",
+  "description": "RatioPrima — Plataforma Interactiva 3D de Fundamentos Matemáticos y Razonamiento Formal (Nivel 0 a Pre-Ingeniería)",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +9,8 @@
     "build": "npm --prefix web run build",
     "preview": "npm --prefix web run preview",
     "test": "node --test tests/*.test.ts",
-    "check": "cd web && npx tsc --noEmit"
+    "check": "cd web && npx tsc --noEmit",
+    "verify": "npm test && npm run check && npm run build"
   },
   "keywords": [
     "mathematics",
