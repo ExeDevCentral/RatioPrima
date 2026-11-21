@@ -44,14 +44,14 @@ function assertUnique(values: string[], label: string) {
   assert.equal(new Set(values).size, values.length, `${label} contiene identificadores repetidos`);
 }
 
-test('Currículo: 8 mundos, 4 misiones por mundo y 108 preguntas', () => {
+test('Currículo: 8 mundos, 4 misiones por mundo y 120 preguntas', () => {
   assert.equal(WORLDS.length, 8);
   assert.equal(ALL_LESSONS.length, 32);
   assert.equal(CONTENT_LESSONS.length, 28);
-  assert.equal(ALL_QUESTIONS.length, 108);
+  assert.equal(ALL_QUESTIONS.length, 120);
   assert.equal(CURRICULUM_STATS.worlds, 8);
   assert.equal(CURRICULUM_STATS.lessons, 32);
-  assert.equal(CURRICULUM_STATS.questions, 108);
+  assert.equal(CURRICULUM_STATS.questions, 120);
 
   assertUnique(WORLDS.map((world) => world.id), 'WORLDS');
   assertUnique(ALL_LESSONS.map((lesson) => lesson.id), 'Lecciones');

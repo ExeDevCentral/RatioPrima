@@ -246,7 +246,6 @@ export default function LessonView() {
                 activeStep={activeTheory}
                 activeFormula={lesson.formulas[activeTheory] ?? lesson.formulas[0]}
                 caption={lesson.theory[activeTheory]?.heading}
-                compact
               />
             </section>
 

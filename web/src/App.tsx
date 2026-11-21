@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { LearningProvider, useLearning, type ViewName } from './state/LearningContext';
 import Dashboard from './views/Dashboard';
 import MapView from './views/MapView';
@@ -12,6 +12,7 @@ import StepsPracticeView from './views/StepsPracticeView';
 import Cinema3DTutorView from './views/Cinema3DTutorView';
 import Icon, { type IconName } from './components/ui/Icon';
 import { Bar, Modal, ProgressRing } from './components/ui/Primitives';
+import SymbolsDrawer from './components/ui/SymbolsDrawer';
 import { LEVEL_TITLES } from './lib/gamification';
 
 interface NavItem {
@@ -24,13 +25,13 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { view: 'dashboard', label: 'Panel', icon: 'home', hint: 'Tu misión de hoy' },
   { view: 'map', label: 'Mapa', icon: 'map', hint: 'Los 8 mundos' },
-  { view: 'exercises', label: 'Ejercicios', icon: 'route', hint: 'Ruta progresiva + auditoría matemática' },
-  { view: 'cinema', label: 'Cine 3D + Tutor', icon: 'laser', hint: 'Acompañamiento interactivo 3D' },
+  { view: 'exercises', label: 'Ejercicios', icon: 'route', hint: 'Ruta guiada' },
+  { view: 'cinema', label: 'Cine 3D + Tutor', icon: 'laser', hint: 'Escenas 3D con tutor' },
   { view: 'practice', label: 'Práctica', icon: 'target', hint: '10 preguntas rápidas' },
-  { view: 'exam', label: 'Simulacros', icon: 'trophy', hint: 'La Arena' },
+  { view: 'exam', label: 'Simulacros', icon: 'trophy', hint: 'Exámenes del ingreso' },
   { view: 'progress', label: 'Progreso', icon: 'chart', hint: 'Tus números' },
   { view: 'plan', label: 'Plan 60 días', icon: 'calendar', hint: 'Semana a semana' },
-  { view: 'lab', label: 'Laboratorio', icon: 'flask', hint: 'Jugar sin reglas' }
+  { view: 'lab', label: 'Laboratorio', icon: 'flask', hint: 'Simuladores libres' }
 ];
 
 const MOBILE_ITEMS: NavItem[] = NAV_ITEMS.filter((item) =>
@@ -41,12 +42,12 @@ function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <div className={`brand ${compact ? 'compact' : ''}`}>
       <div className="brand-mark">
+        <span>R</span>
         <span>P</span>
-        <span>Z</span>
       </div>
       {!compact ? (
         <div className="brand-copy">
-          <strong>Polymath<span>Zero</span></strong>
+          <strong>Ratio<span>Prima</span></strong>
           <small>Ingreso 2027 · matemática</small>
         </div>
       ) : null}
@@ -54,20 +55,33 @@ function Brand({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function SideNav() {
+function SideNav({ collapsed, onToggleCollapse }: { collapsed: boolean; onToggleCollapse: () => void }) {
   const { route, navigate, level, state } = useLearning();
   return (
-    <aside className="side-nav">
+    <aside className={`side-nav ${collapsed ? 'collapsed' : ''}`}>
       <div className="side-nav-top">
-        <Brand />
-        <div className="side-level">
-          <div className="side-level-row">
-            <span>Nivel {level.level}</span>
-            <em>{level.title}</em>
-          </div>
-          <Bar value={level.percent} color="#22d3ee" height={5} />
-          <div className="side-level-xp">{state.xp} XP · {level.remaining > 0 ? `faltan ${level.remaining}` : 'máximo'}</div>
+        <div className="side-brand-row">
+          <Brand compact={collapsed} />
+          <button
+            type="button"
+            className="side-collapse-btn"
+            onClick={onToggleCollapse}
+            title={collapsed ? 'Expandir menú lateral' : 'Contraer menú para ver más grande'}
+            aria-label={collapsed ? 'Expandir menú lateral' : 'Contraer menú lateral'}
+          >
+            {collapsed ? '»' : '«'}
+          </button>
         </div>
+        {!collapsed ? (
+          <div className="side-level">
+            <div className="side-level-row">
+              <span>Nivel {level.level}</span>
+              <em>{level.title}</em>
+            </div>
+            <Bar value={level.percent} color="#22d3ee" height={5} />
+            <div className="side-level-xp">{state.xp} XP · {level.remaining > 0 ? `faltan ${level.remaining}` : 'máximo'}</div>
+          </div>
+        ) : null}
       </div>
 
       <nav className="side-links" aria-label="Navegación principal">
@@ -78,38 +92,48 @@ function SideNav() {
               key={item.view}
               className={`side-link ${active ? 'active' : ''}`}
               onClick={() => navigate(item.view)}
-              title={item.hint}
+              title={`${item.label} — ${item.hint}`}
             >
               <span className="side-link-icon"><Icon name={item.icon} size={18} /></span>
-              <span className="side-link-copy">
-                <strong>{item.label}</strong>
-                <small>{item.hint}</small>
-              </span>
-              <span className="side-link-arrow"><Icon name="chevron" size={13} /></span>
+              {!collapsed ? (
+                <>
+                  <span className="side-link-copy">
+                    <strong>{item.label}</strong>
+                    <small>{item.hint}</small>
+                  </span>
+                  <span className="side-link-arrow"><Icon name="chevron" size={13} /></span>
+                </>
+              ) : null}
             </button>
           );
         })}
       </nav>
 
       <div className="side-nav-bottom">
-        <a className="side-link legacy" href="/workbench">
+        <a className="side-link legacy" href="/workbench" title="Modo avanzado — REPL y demostraciones">
           <span className="side-link-icon"><Icon name="flask" size={18} /></span>
-          <span className="side-link-copy">
-            <strong>Workbench clásico</strong>
-            <small>REPL, demostraciones y canon</small>
-          </span>
-          <span className="side-link-arrow"><Icon name="arrow" size={13} /></span>
+          {!collapsed ? (
+            <>
+              <span className="side-link-copy">
+                <strong>Modo avanzado</strong>
+                <small>REPL y demostraciones</small>
+              </span>
+              <span className="side-link-arrow"><Icon name="arrow" size={13} /></span>
+            </>
+          ) : null}
         </a>
-        <div className="side-foot">
-          <Icon name="laser" size={13} />
-          <span>Hecho para aprender jugando</span>
-        </div>
+        {!collapsed ? (
+          <div className="side-foot">
+            <Icon name="laser" size={13} />
+            <span>RatioPrima · aprender pensando</span>
+          </div>
+        ) : null}
       </div>
     </aside>
   );
 }
 
-function TopHUD() {
+function TopHUD({ onOpenSymbols }: { onOpenSymbols: () => void }) {
   const { state, level, streak, planDay, navigate, toggleSound, toggleMotion, toggleLaser } = useLearning();
   const dailyPercent = Math.min(100, Math.round((state.daily.xp / Math.max(1, state.daily.goal)) * 100));
 
@@ -118,6 +142,16 @@ function TopHUD() {
       <div className="top-hud-mobile">
         <Brand compact />
         <span className="top-hud-day">Día {planDay}</span>
+        <button
+          type="button"
+          className="hud-symbols-btn mobile"
+          onClick={onOpenSymbols}
+          title="Glosario de símbolos matemáticos (Pág. 2)"
+          aria-label="Abrir glosario de símbolos matemáticos"
+        >
+          <span>∈ ∀</span>
+          <span>Símbolos</span>
+        </button>
       </div>
 
       <div className="top-hud-left">
@@ -176,9 +210,20 @@ function TopHUD() {
           </button>
         </div>
 
-        <a className="hud-workbench" href="/workbench" title="Abrir el workbench clásico">
+        <button
+          type="button"
+          className="hud-symbols-btn"
+          onClick={onOpenSymbols}
+          title="Glosario de símbolos matemáticos (Pág. 2)"
+          aria-label="Abrir glosario de símbolos matemáticos"
+        >
+          <span className="hud-symbols-glyph" aria-hidden="true">∈ ∀</span>
+          <span>Símbolos</span>
+        </button>
+
+        <a className="hud-workbench" href="/workbench" title="Abrir el modo avanzado">
           <Icon name="cube" size={15} />
-          <span>Workbench</span>
+          <span>Avanzado</span>
         </a>
       </div>
     </header>
@@ -302,25 +347,32 @@ function Splash() {
 
 function Shell() {
   const { ready, route } = useLearning();
+  const [symbolsOpen, setSymbolsOpen] = useState(false);
+  const [manualCollapse, setManualCollapse] = useState<boolean | null>(null);
   const viewKey = useMemo(() => `${route.view}-${route.lessonId ?? ''}`, [route]);
+  const autoCollapse = route.view === 'lesson' || route.view === 'cinema';
+  const sidebarCollapsed = manualCollapse ?? autoCollapse;
 
   if (!ready) return <Splash />;
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <div className="app-bg" aria-hidden="true">
         <span className="bg-grid" />
         <span className="bg-glow bg-glow-1" />
         <span className="bg-glow bg-glow-2" />
       </div>
-      <SideNav />
+      <SideNav
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setManualCollapse(!sidebarCollapsed)}
+      />
       <div className="app-main">
-        <TopHUD />
+        <TopHUD onOpenSymbols={() => setSymbolsOpen(true)} />
         <main className="app-content" key={viewKey}>
           <RoutedView />
         </main>
         <footer className="app-footer">
-          <span>Polymath Zero · matemática del cursillo de ingreso 2027</span>
+          <span>RatioPrima · matemática del cursillo de ingreso 2027</span>
           <span>
             <Icon name="laser" size={12} /> 8 mundos · 32 misiones · 60 días
           </span>
@@ -329,6 +381,7 @@ function Shell() {
       <MobileNav />
       <Toasts />
       <LevelUpModal />
+      <SymbolsDrawer open={symbolsOpen} onClose={() => setSymbolsOpen(false)} />
     </div>
   );
 }

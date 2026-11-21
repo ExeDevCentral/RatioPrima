@@ -26,7 +26,7 @@ export default function StepsPracticeView() {
   const [inputs, setInputs] = useState<Record<string, string>>({});
   const [verdicts, setVerdicts] = useState<Record<string, AIReviewResult>>({});
   const [scanning, setScanning] = useState(false);
-  const [showHint, setShowHint] = useState(false);
+  const [helpStage, setHelpStage] = useState<0 | 1 | 2>(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const scanTimerRef = useRef<number | null>(null);
 
@@ -58,7 +58,7 @@ export default function StepsPracticeView() {
   const seriesLabel = (id: StepSeriesId) => id === 'zero' ? 'Nivel 0' : id === 'simple' ? 'Nivel 1' : 'Nivel 2';
 
   useEffect(() => {
-    setShowHint(false);
+    setHelpStage(0);
     setScanning(false);
     const id = window.setTimeout(() => {
       inputRef.current?.focus();
@@ -150,6 +150,9 @@ export default function StepsPracticeView() {
       const previousCorrect = state.questionStats[exercise.id]?.correct ?? 0;
       const isNewAuditedAnswer = verdicts[exercise.id]?.normalizedInput !== result.normalizedInput;
       setVerdicts((prev) => ({ ...prev, [exercise.id]: result }));
+      if (!result.isCorrect) {
+        setHelpStage((prev) => (prev === 0 ? 1 : prev));
+      }
       setScanning(false);
       if (isNewAuditedAnswer) {
         recordQuestion(
@@ -212,13 +215,13 @@ export default function StepsPracticeView() {
     <div className="view steps-view">
       <section className="panel steps-hero">
         <div className="steps-hero-copy">
-          <div className="eyebrow">Ruta progresiva · Auditoría matemática local</div>
+          <div className="eyebrow">Práctica guiada · Nivel 0 a Nivel 2</div>
           <h1>
             Aprendé haciendo <span className="gradient-text">paso a paso</span>
           </h1>
           <p>
-            Empezá desde las bases, resolvé problemas del ingreso y avanzá hacia desafíos. El corrector local
-            compara respuestas y errores conocidos: no usa un modelo generativo ni envía datos a un servicio externo.
+            Intentá resolver primero por tu cuenta. El corrector verifica equivalencias (fracciones, decimales y
+            despejes) y detecta errores clásicos al instante sin salir de tu navegador.
           </p>
         </div>
 
@@ -302,10 +305,13 @@ export default function StepsPracticeView() {
         </div>
         {isSeriesComplete ? (
           <div className="exercise-audit-inline">
-            <strong>Auditoría de la ruta</strong>
+            <strong>Resumen de tu recorrido</strong>
             <span>Fortalezas: {audit.strengths.length ? audit.strengths.join(', ') : 'aún sin datos suficientes'}.</span>
             <span>Para reforzar: {audit.weaknesses.length ? audit.weaknesses.join(', ') : 'sin debilidades concluyentes'}.</span>
-            <span>En el historial: {audit.correct} aciertos · {audit.incorrect} errores · {audit.coveredTopics} temas con intentos</span>
+            <span>
+              En el historial: {audit.correct} {audit.correct === 1 ? 'acierto' : 'aciertos'} · {audit.incorrect}{' '}
+              {audit.incorrect === 1 ? 'error' : 'errores'} · {audit.coveredTopics} temas practicados
+            </span>
             {nextSeries ? <button type="button" className="btn btn-primary btn-sm" disabled={!canAdvance} onClick={() => switchSeries(nextSeries)}>{canAdvance ? `Avanzar a ${seriesLabel(nextSeries)}` : 'Resolvé 8 de 10 para avanzar'} <Icon name="arrow" size={14} /></button> : null}
           </div>
         ) : null}
@@ -324,21 +330,12 @@ export default function StepsPracticeView() {
               </Pill>
               <Pill color="#22d3ee">{exercise.topic}</Pill>
             </div>
-            <span className="steps-kbd-hint">Corrector local · presioná <kbd>Enter</kbd> para revisar o avanzar</span>
+            <span className="steps-kbd-hint">Presioná <kbd>Enter</kbd> para verificar o avanzar</span>
           </div>
 
           <h2 className="steps-prompt">
             <RichText text={exercise.prompt} />
           </h2>
-
-          <div className="steps-guide-box">
-            <div className="steps-guide-head">
-              <Icon name="book" size={14} />
-              <strong>Cómo resolverlo (sin adivinar)</strong>
-            </div>
-            <p>{exercise.guide}</p>
-            <div className="steps-mini-example">{exercise.miniExample}</div>
-          </div>
 
           <div className={`steps-input-wrap ${scanning ? 'scanning' : ''} ${currentReview ? currentReview.tone : ''}`}>
             <input
@@ -361,10 +358,57 @@ export default function StepsPracticeView() {
               disabled={scanning}
             >
               <Icon name="spark" size={16} />
-              {scanning ? 'Revisando...' : 'Auditar respuesta'}
+              {scanning ? 'Verificando...' : 'Verificar respuesta'}
             </button>
             {scanning ? <div className="ai-scan-beam" aria-hidden="true" /> : null}
           </div>
+
+          <div className="steps-help-controls">
+            <button
+              type="button"
+              className={`chip ${helpStage >= 1 ? 'active' : ''}`}
+              onClick={() => {
+                playClick();
+                setHelpStage((prev) => (prev === 0 ? 1 : 0));
+              }}
+              aria-expanded={helpStage >= 1}
+            >
+              <Icon name="bulb" size={14} />
+              {helpStage >= 1 ? 'Ocultar ayuda' : 'Pista conceptual'}
+            </button>
+            {helpStage === 1 ? (
+              <button
+                type="button"
+                className="chip"
+                onClick={() => {
+                  playClick();
+                  setHelpStage(2);
+                }}
+              >
+                <Icon name="book" size={14} /> Ver ejemplo paso a paso
+              </button>
+            ) : null}
+          </div>
+
+          {helpStage >= 1 ? (
+            <div className="steps-guide-box step-reveal">
+              <div className="steps-guide-head">
+                <Icon name="bulb" size={14} />
+                <strong>Pista conceptual</strong>
+              </div>
+              <p>{exercise.hint}</p>
+              {helpStage >= 2 ? (
+                <>
+                  <div className="steps-guide-head" style={{ marginTop: 10 }}>
+                    <Icon name="book" size={14} />
+                    <strong>Cómo resolverlo (ejemplo similar)</strong>
+                  </div>
+                  <p>{exercise.guide}</p>
+                  <div className="steps-mini-example">{exercise.miniExample}</div>
+                </>
+              ) : null}
+            </div>
+          ) : null}
 
           <div className="math-keypad" aria-label="Teclado numérico rápido">
             {KEYPAD_KEYS.map((k) => (
@@ -379,20 +423,13 @@ export default function StepsPracticeView() {
               type="button"
               className="keypad-btn wide"
               onClick={() => {
-                setShowHint((h) => !h);
+                setHelpStage((prev) => (prev < 2 ? ((prev + 1) as 1 | 2) : 0));
                 playClick();
               }}
             >
-              <Icon name="bulb" size={14} /> Pista
+              <Icon name="bulb" size={14} /> {helpStage === 0 ? 'Pista' : helpStage === 1 ? 'Ejemplo' : 'Ocultar'}
             </button>
           </div>
-
-          {showHint ? (
-            <div className="theory-note step-reveal">
-              <Icon name="bulb" size={15} />
-              <span>{exercise.hint}</span>
-            </div>
-          ) : null}
 
           <div className="steps-nav-row">
             <button type="button" className="btn btn-ghost" onClick={goPrev} disabled={index === 0}>
@@ -414,15 +451,15 @@ export default function StepsPracticeView() {
 
         <section className="panel ai-review-panel">
           <SectionTitle
-            eyebrow="Corrector matemático local"
-            title="Auditoría y pasos simples"
-            description="Compara respuestas equivalentes y detecta errores frecuentes con reglas verificables."
+            eyebrow="Tutor local"
+            title="Diagnóstico paso a paso"
+            description="Verifica equivalencias y te explica el porqué de cada paso sin adivinar."
           />
 
           {scanning ? (
             <div className="ai-loading-box">
               <div className="ai-pulse-orb" />
-              <p>Comparando la respuesta con el resultado y los errores frecuentes...</p>
+              <p>Verificando tu respuesta y los pasos...</p>
             </div>
           ) : currentReview ? (
             <div key={`${exercise.id}-${currentReview.normalizedInput}`} className={`ai-verdict-card ${currentReview.tone}`}>
@@ -438,29 +475,31 @@ export default function StepsPracticeView() {
               <p className="ai-verdict-body">{currentReview.diagnosis}</p>
 
               <div className="ai-steps-list">
-                {exercise.steps.map((st, idx) => (
-                  <article
-                    key={st.title}
-                    className="ai-step-item"
-                    style={{ animationDelay: `${idx * 110}ms` }}
-                  >
-                    <div className="ai-step-num">{idx + 1}</div>
-                    <div className="ai-step-copy">
-                      <strong>{st.title}</strong>
-                      <p>{st.detail}</p>
-                      {st.latex ? <FormulaCard formula={st.latex} /> : null}
-                    </div>
-                  </article>
-                ))}
+                {exercise.steps.map((st, idx) => {
+                  const isFinal = idx === exercise.steps.length - 1;
+                  return (
+                    <article
+                      key={st.title}
+                      className={`ai-step-item ${isFinal ? 'is-final' : ''}`}
+                    >
+                      <div className="ai-step-num">{idx + 1}</div>
+                      <div className="ai-step-copy">
+                        <strong>{st.title}</strong>
+                        <p>{st.detail}</p>
+                        {st.latex ? <FormulaCard formula={st.latex} /> : null}
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             </div>
           ) : (
             <div className="ai-idle-box">
               <Icon name="brain" size={28} />
-              <strong>Auditoría lista</strong>
+              <strong>Listo para verificar</strong>
               <p>
-                Escribí tu resultado y presioná <kbd>Enter</kbd>. El corrector local compara la respuesta,
-                admite equivalencias y detecta patrones de error definidos para el ejercicio.
+                Probá resolverlo primero y presioná <kbd>Enter</kbd>. Si te trabás, tocá{' '}
+                <strong>Pista conceptual</strong> para destrabar el razonamiento sin ver la respuesta.
               </p>
             </div>
           )}

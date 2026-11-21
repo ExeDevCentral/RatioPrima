@@ -31,6 +31,9 @@ export default function Dashboard() {
 
   const completed = state.completedLessons.length;
   const overall = Math.round((completed / Math.max(1, ALL_LESSONS.length)) * 100);
+  const correctTotal = totalCorrect(state);
+  const weeklyDone = Math.min(7, Math.max(streak, state.daily.lessons > 0 ? 1 : 0));
+  const weeklyPercent = Math.round((weeklyDone / 7) * 100);
   const nextDays = PLAN_60.filter((day) => day.day >= planDay).slice(0, 5);
   const unlockedBadges = state.badges
     .map((id) => achievementById(id))
@@ -47,30 +50,32 @@ export default function Dashboard() {
 
   return (
     <div className="view dashboard">
-      <section className="hero">
+      <section className="hero hero-focus">
         <div className="hero-copy">
-          <div className="eyebrow">Tu ruta · Ingreso 2027</div>
+          <div className="eyebrow">Tu paso de hoy · ~{lesson?.minutes ?? 10} min · Día {planDay} de 60</div>
           <h1>
-            Matemática,<br />
-            <span className="gradient-text">convertida en juego.</span>
+            {lesson?.title ?? 'Consolidá tu progreso'}
+            <br />
+            <span className="gradient-text">{world?.name ?? 'RatioPrima · Ingreso 2027'}</span>
           </h1>
           <p>
-            Ocho mundos, 32 misiones y 60 días para dominar los conceptos del cursillo.
-            Cada fórmula se ve, se toca y se resuelve. Sin memorizar a ciegas.
+            <RichText text={lesson?.tagline ?? 'Un paso claro por día: cada fórmula se entiende, se visualiza y se practica sin memorizar a ciegas.'} />
           </p>
           <div className="hero-actions">
-            <button className="btn btn-primary" onClick={() => openLesson(recommended)}>
+            <button className="btn btn-primary btn-lg" onClick={() => openLesson(recommended)}>
               <Icon name="play" size={16} />
-              {completed === 0 ? 'Empezar mi ruta' : 'Continuar donde quedé'}
+              Continuar misión
             </button>
-            <button className="btn btn-ghost" onClick={() => navigate('map')}>
-              <Icon name="map" size={16} /> Ver el mapa
+            <button className="btn btn-ghost" onClick={() => navigate('exercises')}>
+              <Icon name="route" size={16} /> Práctica guiada
             </button>
           </div>
-          <div className="hero-meta">
-            <span><Icon name="clock" size={14} /> Día {planDay} de 60</span>
-            <span><Icon name="book" size={14} /> {CURRICULUM_STATS.lessons} lecciones</span>
-            <span><Icon name="target" size={14} /> {CURRICULUM_STATS.questions} preguntas</span>
+          <div className="hero-weekly">
+            <div className="hero-weekly-row">
+              <span>Progreso semanal · {weeklyDone}/7 días activos</span>
+              <strong>{overall}% del mapa ({completed}/{ALL_LESSONS.length})</strong>
+            </div>
+            <Bar value={weeklyPercent} color="#22d3ee" height={7} />
           </div>
         </div>
 
@@ -99,11 +104,10 @@ export default function Dashboard() {
       </section>
 
       <section className="stat-row">
-        <StatTile icon="bolt" label="Nivel" value={`${level.level} · ${level.title}`} color="#22d3ee" />
         <StatTile icon="flame" label="Racha" value={`${streak} ${streak === 1 ? 'día' : 'días'}`} color="#fb923c" hint={`Mejor: ${state.bestStreak}`} />
-        <StatTile icon="target" label="Precisión" value={`${accuracyPercent(state)}%`} color="#34d399" hint={`${totalCorrect(state)} aciertos`} />
+        <StatTile icon="target" label="Precisión" value={`${accuracyPercent(state)}%`} color="#34d399" hint={`${correctTotal} ${correctTotal === 1 ? 'acierto' : 'aciertos'}`} />
         <StatTile icon="book" label="Lecciones" value={`${completed}/${ALL_LESSONS.length}`} color="#a78bfa" hint={`${overall}% del mapa`} />
-        <StatTile icon="star" label="Logros" value={`${state.badges.length}/${ACHIEVEMENTS.length}`} color="#fde047" />
+        <StatTile icon="star" label="Logros" value={`${state.badges.length}/${ACHIEVEMENTS.length}`} color="#fde047" hint={`Nivel ${level.level} · ${level.title}`} />
       </section>
 
       <div className="dashboard-grid">

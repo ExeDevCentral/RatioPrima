@@ -342,13 +342,18 @@ export default function Math3DScene({
     stepStartRef.current = typeof performance !== 'undefined' ? performance.now() : 0;
   }, [buildStep, kind]);
 
-  // Encuadre inicial de la escena estrella: el triángulo tiene que llenar el
-  // canvas desde el primer segundo, no quedar perdido en el espacio.
+  // Encuadre inicial amplio y nítido: las figuras llenan el canvas desde el primer frame.
   useEffect(() => {
     if (kind === 'righttriangle3d') {
       yawRef.current = 0.5;
       pitchRef.current = 0.24;
       zoomRef.current = 2.45;
+    } else if (kind === 'sets3d') {
+      yawRef.current = 0.42;
+      pitchRef.current = 0.34;
+      zoomRef.current = 1.62;
+    } else {
+      zoomRef.current = 1.48;
     }
     manualZoomRef.current = false;
   }, [kind]);
@@ -525,7 +530,7 @@ export default function Math3DScene({
         return;
       }
       const stepProgress = easeOutCubic(
-        Math.min(1, (performance.now() - stepStartRef.current) / 850)
+        Math.min(1, (performance.now() - stepStartRef.current) / 1350)
       );
       const { kind: k, paramA: a, paramB: b, autoRotate: auto, buildStep: bStep } = stateRef.current;
       const reduced =
@@ -534,11 +539,11 @@ export default function Math3DScene({
 
       if (auto && !draggingRef.current && !handleDragRef.current && !reduced) {
         if (k === 'righttriangle3d') {
-          // Balanceo suave en vez de giro completo: nunca perdemos de vista el plano.
-          yawRef.current = 0.5 + Math.sin(time * 0.42) * 0.22;
-          pitchRef.current = 0.24 + Math.sin(time * 0.3) * 0.05;
+          // Balanceo suave y pausado: nunca perdemos de vista el plano.
+          yawRef.current = 0.5 + Math.sin(time * 0.26) * 0.18;
+          pitchRef.current = 0.24 + Math.sin(time * 0.2) * 0.04;
         } else {
-          yawRef.current += 0.0042;
+          yawRef.current += 0.0018;
         }
       }
 
@@ -817,7 +822,7 @@ export default function Math3DScene({
           drawSeg(O, P1, 'rgba(196, 181, 253, 0.85)', 1.8, 6, [4, 5]);
           drawDot(P1, 3.8, '#c4b5fd', 10);
           if (grow1 > 0.5) {
-            drawTag3D(atAngle(UNIT * 0.45, 0.9), '1 rad ≈ 57,3°', '#c4b5fd', -18, 0, 11);
+            drawTag3D(atAngle(UNIT * 0.78, 1.08), '1 rad ≈ 57,3°', '#c4b5fd', 16, -16, 11);
           }
         }
 
@@ -1061,29 +1066,41 @@ export default function Math3DScene({
         if (bStep >= 1 && exp >= 2) drawText3D({ x: -0.5, y: -2.8, z: 0.4 }, 'a²', '#a78bfa');
         if (bStep >= 2 && exp >= 3) drawText3D({ x: 2.5, y: -2.8, z: 1.5 }, 'a³', '#fde047');
       } else if (k === 'sets3d') {
-        // Concentric rings built RING BY RING (bStep 0..3)
+        // Concentric rings built RING BY RING (bStep 0..3) — spaced clearly with non-overlapping pills
         const rings = [
-          { r: 0.9, y: -1.8, color: '#34d399', label: 'ℕ (Contar)' },
-          { r: 1.7, y: -1.2, color: '#22d3ee', label: 'ℤ (Negativos)' },
-          { r: 2.5, y: -0.6, color: '#a78bfa', label: 'ℚ (Fracciones)' },
-          { r: 3.3, y: 0.0, color: '#fde047', label: 'ℝ (Todos)' }
+          { r: 1.05, y: -2.05, color: '#34d399', label: 'ℕ (Contar)', side: -1, dx: -14, dy: 14 },
+          { r: 1.9, y: -1.1, color: '#22d3ee', label: 'ℤ (Negativos)', side: 1, dx: 14, dy: 8 },
+          { r: 2.75, y: -0.15, color: '#a78bfa', label: 'ℚ (Fracciones)', side: -1, dx: -14, dy: -6 },
+          { r: 3.55, y: 0.8, color: '#fde047', label: 'ℝ (Todos)', side: 1, dx: 14, dy: -12 }
         ];
         const visibleCount = Math.min(rings.length, bStep + 1);
         for (let idx = 0; idx < visibleCount; idx++) {
           const ring = rings[idx];
           const isCurrent = idx === visibleCount - 1;
-          for (let i = 0; i < 36; i++) {
-            const t1 = (i / 36) * Math.PI * 2 + time * 0.2;
-            const t2 = ((i + 1) / 36) * Math.PI * 2 + time * 0.2;
+          const grow = isCurrent ? stepProgress : 1;
+          const segs = 48;
+          const drawSegs = Math.max(2, Math.round(segs * grow));
+          for (let i = 0; i < drawSegs; i++) {
+            const t1 = (i / segs) * Math.PI * 2 + time * 0.1;
+            const t2 = ((i + 1) / segs) * Math.PI * 2 + time * 0.1;
             drawSeg(
               { x: Math.cos(t1) * ring.r, y: ring.y, z: Math.sin(t1) * ring.r },
               { x: Math.cos(t2) * ring.r, y: ring.y, z: Math.sin(t2) * ring.r },
               ring.color,
-              isCurrent ? 3.2 : 1.4,
-              isCurrent ? 14 : 0
+              isCurrent ? 3.8 : 2.1,
+              isCurrent ? 16 : 4
             );
           }
-          drawText3D({ x: ring.r + 0.15, y: ring.y, z: 0 }, ring.label, ring.color);
+          if (grow > 0.35) {
+            drawTag3D(
+              { x: ring.side * (ring.r + 0.18), y: ring.y, z: 0 },
+              ring.label,
+              ring.color,
+              ring.dx,
+              ring.dy,
+              12
+            );
+          }
         }
         // Absolute value V-cone appears on step 4 (bStep >= 3)
         if (bStep >= 3) {

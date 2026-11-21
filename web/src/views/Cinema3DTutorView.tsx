@@ -75,12 +75,12 @@ export default function Cinema3DTutorView() {
         <div>
           <span className="eyebrow">Pantalla Panorámica 3D + Tutoría Socrática</span>
           <h1>
-            Cine 3D <span className="gradient-text">&amp; Tutor IA</span>
+            Cine 3D <span className="gradient-text">&amp; Tutor local</span>
           </h1>
         </div>
         <div className="preset-row">
           <Pill icon="laser" color="#22d3ee">{SCENE_META[activeScene].title}</Pill>
-          <Pill icon="brain" color="#a78bfa">Modo Tutor · Nunca Autor</Pill>
+          <Pill icon="brain" color="#a78bfa">Guía socrática · Nunca resuelve por vos</Pill>
         </div>
       </div>
 

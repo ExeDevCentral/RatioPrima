@@ -466,7 +466,7 @@ export default function GuidedAnimationStudio({
         const lenCA = lenH * Math.cos(rad);
         const lenCO = lenH * Math.sin(rad);
 
-        drawBadge((originX + topX) / 2 - 36, (originY + topY) / 2 - 14, `Hipotenusa H = ${lenH.toFixed(2)}`, '#fde047');
+        drawBadge((originX + topX) / 2 - 58, (originY + topY) / 2 - 26, `Hipotenusa H = ${lenH.toFixed(2)}`, '#fde047');
         drawBadge((originX + rightX) / 2, originY + 22, `Cateto Adyacente CA = ${lenCA.toFixed(2)}`, '#22d3ee');
         drawBadge(rightX + 86, (rightY + topY) / 2, `Opuesto CO = ${lenCO.toFixed(2)}`, '#fb7185');
 

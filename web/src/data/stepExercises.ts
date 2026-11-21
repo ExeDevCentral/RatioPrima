@@ -119,7 +119,7 @@ export function reviewAnswerWithAI(exercise: StepExercise, rawInput: string): AI
       return {
         isCorrect: false,
         tone: 'close',
-        headline: 'IA detectó un error clásico',
+        headline: 'Diagnóstico: error clásico detectado',
         diagnosis: rule.diagnosis,
         normalizedInput
       };
