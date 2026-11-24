@@ -23,5 +23,10 @@
     "react"
   ],
   "author": "Exequiel Echevarria <exedevcentral@github.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ExeDevCentral/RatioPrima.git"
+  },
+  "homepage": "https://github.com/ExeDevCentral/RatioPrima"
 }
